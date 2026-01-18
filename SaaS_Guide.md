@@ -422,7 +422,9 @@ test.describe('Landing Page', () => {
 - 5 unit tests for Sign In page ✓
 - Google Login Button component with loading/error states ✓
 - Sign In page with Google Login integration ✓
-- Better-Auth API routes at /api/auth/[...nextauth]/route.ts ✓
+- Better-Auth API routes at /api/auth/[...all]/route.ts ✓
+- Google OAuth SVG logo ✓
+- Accessibility attributes (aria-label, type) ✓
 
 **Next**: Epic 4 - User Dashboard (RED phase)
 
