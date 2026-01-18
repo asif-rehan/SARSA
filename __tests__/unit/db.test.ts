@@ -6,7 +6,7 @@ describe('Database Connection', () => {
   let db: Kysely;
 
   beforeAll(() => {
-    process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://saas_user:saas_password@localhost:5432/saas_dev';
+    process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://saas_user:saas_password@localhost:5433/saas_dev';
     
     db = new Kysely({
       dialect: new PostgresDialect({
@@ -36,7 +36,7 @@ describe('Database Connection', () => {
     const invalidDb = new Kysely({
       dialect: new PostgresDialect({
         pool: new Pool({
-          connectionString: 'postgresql://invalid:invalid@localhost:5432/invalid',
+          connectionString: 'postgresql://invalid:invalid@localhost:5433/invalid',
         }),
       }),
     });

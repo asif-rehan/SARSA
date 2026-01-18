@@ -23,7 +23,7 @@ describe('Database Health Check', () => {
 
   it('should verify all required tables exist', async () => {
     const tables = await db.introspection.getTables();
-    const tableNames = tables.map(t => t.name);
+    const tableNames = tables.map((t: any) => t.name);
     
     expect(tableNames).toContain('user');
     expect(tableNames).toContain('session');
