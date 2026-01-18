@@ -21,43 +21,56 @@ To enable AI-assisted coding with Better-Auth, include these commands:
 
 ### 1.1 Initialize the Project
 
-```bash
-# Create Next.js project with TypeScript
-npx create-next-app@latest saas-app --typescript --tailwind --app --no-src-dir
-
-# Move files to root and clean up
-mv saas-app/* saas-app/.* . 2>/dev/null || true
-rmdir saas-app
-
-# Initialize git (if not already done)
-git init
-git add .
-git commit -m "Initial commit: Next.js setup"
-```
-
-### 1.2 Install Minimal Required Packages
+Run the automated setup script which handles all project initialization:
 
 ```bash
-# Core dependencies (versions from demo app)
-npm install better-auth kysely@^0.28.5 pg
-
-# Dev dependencies
-npm install -D @types/pg kysely-codegen
-
-# Testing dependencies
-npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom jsdom
-npm install -D playwright @playwright/test
-npm install -D @testing-library/user-event
-
-# Environment variables
-npm install -D dotenv-cli
+# Make script executable and run
+chmod +x setup.sh
+./setup.sh
 ```
 
-### 1.3 Database Setup
+The script automatically:
+- Creates Next.js project with TypeScript, Tailwind CSS, App Router, ESLint
+- Installs all required dependencies (better-auth, kysely, pg, testing libraries)
+- Creates `docker-compose.yml` for PostgreSQL
+- Creates `scripts/setup-env.sh` for environment configuration
+- Creates auth configuration files (`lib/auth.ts`, `lib/db.ts`, `lib/auth-client.ts`)
+- Sets up testing configuration (Vitest, Playwright)
+- Creates test directories (`__tests__/unit`, `__tests__/integration`, `e2e`)
+- Updates `package.json` with necessary scripts
 
-#### Docker PostgreSQL Setup
+### 1.2 Database Setup
 
-Create `docker-compose.yml`:
+#### Start PostgreSQL
+
+```bash
+npm run db:start
+```
+
+#### Setup Environment Variables
+
+```bash
+./scripts/setup-env.sh
+```
+
+This creates `.env.local` with:
+- Database URL for PostgreSQL
+- Better-Auth secret
+- Google OAuth placeholders (update these manually)
+
+#### Run Database Migration
+
+```bash
+npm run db:migrate
+```
+
+This creates the Better-Auth schema in PostgreSQL.
+
+**Note**: The files below are automatically created by the setup script, but are included here for reference.
+
+---
+
+#### Reference: docker-compose.yml
 
 ```yaml
 version: '3.8'
@@ -83,48 +96,37 @@ volumes:
   postgres_data:
 ```
 
-#### Environment Setup Script
-
-Create `scripts/setup-env.sh`:
+#### Reference: scripts/setup-env.sh
 
 ```bash
 #!/bin/bash
 
-# Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${YELLOW}Setting up environment variables...${NC}"
 
-# Database configuration
 DB_USER="saas_user"
 DB_PASSWORD="saas_password"
 DB_NAME="saas_dev"
 DB_HOST="localhost"
 DB_PORT="5432"
 
-# Construct database URL
 DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
-# Better-Auth configuration
 BETTER_AUTH_SECRET=$(openssl rand -base64 32)
 BETTER_AUTH_URL="http://localhost:3000"
 
-# Create .env.local file
 cat > .env.local << EOF
-# Database Configuration
 DATABASE_URL=${DATABASE_URL}
 
-# Better-Auth Configuration
 BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 BETTER_AUTH_URL=${BETTER_AUTH_URL}
 
-# Google OAuth (to be filled manually)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
-# Application Configuration
 NODE_ENV=development
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 EOF
@@ -132,37 +134,29 @@ EOF
 echo -e "${GREEN}✓ .env.local file created successfully!${NC}"
 echo -e "${YELLOW}Note: Please update Google OAuth credentials manually${NC}"
 
-# Make the file readable only by owner
 chmod 600 .env.local
 
 echo -e "${GREEN}✓ Environment setup complete!${NC}"
 ```
 
-Make the script executable:
+#### Reference: lib/db.ts
 
-```bash
-chmod +x scripts/setup-env.sh
+```typescript
+import { Kysely, PostgresDialect } from "kysely";
+import { Pool } from "pg";
+
+const dialect = new PostgresDialect({
+  pool: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+});
+
+export const db = new Kysely({
+  dialect,
+});
 ```
 
-#### Setup Commands
-
-```bash
-# Start PostgreSQL
-docker-compose up -d
-
-# Wait for PostgreSQL to be ready
-docker-compose exec postgres pg_isready -U saas_user -d saas_dev
-
-# Setup environment variables
-./scripts/setup-env.sh
-
-# Initialize Better-Auth (this will create the auth schema)
-npx better-auth init
-```
-
-### 1.4 Better-Auth Configuration
-
-Create `lib/auth.ts`:
+#### Reference: lib/auth.ts
 
 ```typescript
 import { betterAuth } from "better-auth";
@@ -182,26 +176,21 @@ export const auth = betterAuth({
 });
 ```
 
-Create `lib/db.ts`:
+#### Reference: lib/auth-client.ts
 
 ```typescript
-import { Kysely, PostgresDialect } from "kysely";
-import { Pool } from "pg";
+import { createAuthClient } from "better-auth/client";
 
-const dialect = new PostgresDialect({
-  pool: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
-});
-
-export const db = new Kysely({
-  dialect,
+export const authClient = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_APP_URL,
 });
 ```
 
-### 1.5 Testing Configuration
+### 1.3 Testing Configuration
 
-Create `vitest.config.ts`:
+The following files are automatically created by the setup script. Included for reference:
+
+#### Reference: vitest.config.ts
 
 ```typescript
 import { defineConfig } from 'vitest/config';
@@ -223,7 +212,7 @@ export default defineConfig({
 });
 ```
 
-Create `vitest.setup.ts`:
+#### Reference: vitest.setup.ts
 
 ```typescript
 import '@testing-library/jest-dom';
@@ -235,7 +224,7 @@ afterEach(() => {
 });
 ```
 
-Create `playwright.config.ts`:
+#### Reference: playwright.config.ts
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test';
@@ -265,25 +254,21 @@ export default defineConfig({
 });
 ```
 
-Update `package.json` scripts:
+#### Available Scripts
 
-```json
-{
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "db:start": "docker-compose up -d",
-    "db:stop": "docker-compose down",
-    "db:migrate": "npx better-auth migrate",
-    "setup": "./scripts/setup-env.sh && npm run db:start && npm run db:migrate"
-  }
-}
-```
+The setup script adds these scripts to `package.json`:
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm test` - Run unit/integration tests
+- `npm run test:ui` - Run tests with UI
+- `npm run test:e2e` - Run end-to-end tests
+- `npm run test:e2e:ui` - Run e2e tests with UI
+- `npm run db:start` - Start PostgreSQL container
+- `npm run db:stop` - Stop PostgreSQL container
+- `npm run db:migrate` - Run Better-Auth migrations
+- `npm run setup` - Full setup (env + db + migrate)
 
 ---
 
