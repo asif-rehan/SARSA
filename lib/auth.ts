@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth";
-import { neon } from "@neondatabase/neon";
+import { Pool } from "pg";
 
 export const auth = betterAuth({
-  database: neon(process.env.DATABASE_URL),
+  database: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
   emailAndPassword: {
     enabled: true,
   },
