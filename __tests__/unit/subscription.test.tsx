@@ -3,11 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SubscriptionPlans } from '@/components/SubscriptionPlans';
 
 // Mock Stripe
+const mockStripe = {
+  confirmPayment: vi.fn(),
+  elements: vi.fn(),
+  redirectToCheckout: vi.fn(),
+};
+
 vi.mock('@stripe/stripe-js', () => ({
-  loadStripe: vi.fn(() => Promise.resolve({
-    confirmPayment: vi.fn(),
-    elements: vi.fn(),
-  })),
+  loadStripe: vi.fn(() => Promise.resolve(mockStripe as any)),
 }));
 
 // Mock auth client
