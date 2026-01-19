@@ -653,6 +653,14 @@ The setup script adds these scripts to `package.json`:
 - 🔵 Stripe integration functional but tests fail as expected
 - Status: 11/11 tests implemented (designed to fail in RED phase)
 
+**Integration Tests** (`__tests__/integration/stripe-environment.test.ts`):
+- ⚠️ RED Phase: Tests written to fail first (TDD methodology)
+- 🔵 Environment validation working with TDD approach
+- Status: 13/13 tests implemented (8 failing in RED, 5 passing in GREEN)
+- ✅ Validates STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+- ✅ Tests .env.local file content and key formats
+- ✅ Ensures Stripe integration is properly tested before implementation
+
 **E2E Tests** (`e2e/subscription-flow.spec.ts`):
 - ⚠️ RED Phase: Tests written to fail first (TDD methodology)
 - 🔵 User journeys functional but tests fail as expected  
