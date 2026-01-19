@@ -18,7 +18,7 @@ interface Subscription {
   cancelAtPeriodEnd?: boolean;
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY! || 'pk_test_placeholder');
 
 const plans: Plan[] = [
   {
@@ -60,8 +60,8 @@ const SubscriptionPlans: React.FC = () => {
   const fetchCurrentSubscription = async () => {
     try {
       const session = await authClient.getSession();
-      if (session.data?.user?.subscription) {
-        setSubscription(session.data.user.subscription);
+      if ((session.data?.user as any)?.subscription) {
+        setSubscription((session.data?.user as any).subscription);
       }
     } catch (err) {
       console.error('Failed to fetch subscription:', err);
@@ -110,7 +110,12 @@ const SubscriptionPlans: React.FC = () => {
 
       // Redirect to Stripe Checkout
       const stripe = await stripePromise;
-      const { error: stripeError } = await stripe!.redirectToCheckout({ sessionId });
+      if (stripe && 'redirectToCheckout' in stripe) {
+        const result = await stripe.redirectToCheckout({ sessionId });
+        if (result.error) {
+          setError(result.error.message || 'Payment failed. Please try again.');
+        }
+      }
 
       if (stripeError) {
         setError(stripeError.message || 'Payment failed. Please try again.');
