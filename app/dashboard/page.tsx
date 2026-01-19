@@ -29,6 +29,9 @@ export default function Dashboard({ session }: { session: { user?: { name: strin
               <a href="/profile" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
                 Profile
               </a>
+              <a href="/subscription" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+                Subscription
+              </a>
               <a href="/settings" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
                 Settings
               </a>
