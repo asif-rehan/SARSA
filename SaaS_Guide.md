@@ -665,3 +665,10 @@ After completing the foundation epics:
 - [ ] Start Epic 1: Write RED tests first!
 
 **Remember**: Never write implementation code before writing tests! TDD = Tests First, Code Second.
+
+**Current Epic Status Overview**:
+- ✅ Epic 1: Project Foundation & Database Connectivity - Tests passing
+- ✅ Epic 2: Landing Page with CTAs - Tests passing, accessibility verified
+- ✅ Epic 3: Google Social Login + Dashboard Routing - Tests passing, key requirement (dashboard redirect) fulfilled
+- 🔄 Epic 4: User Dashboard (Post-Login) - Implementation in progress
+- ⏳ Epic 5+: Subscription Management, Email Verification, etc. - Planned
