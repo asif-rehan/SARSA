@@ -10,16 +10,20 @@ interface GoogleLoginButtonProps {
 
 export default function GoogleLoginButton({ isLoading = false, disabled = false }: GoogleLoginButtonProps) {
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const handleGoogleLogin = async () => {
     try {
       setError(null);
+      setIsAuthenticating(true);
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        callbackURL: '/dashboard',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -28,11 +32,11 @@ export default function GoogleLoginButton({ isLoading = false, disabled = false 
       <button
         type="button"
         onClick={handleGoogleLogin}
-        disabled={disabled || isLoading}
+        disabled={disabled || isLoading || isAuthenticating}
         aria-label="Sign in with Google"
         className="flex h-12 w-full items-center justify-center gap-3 rounded-full border-2 border-zinc-300 bg-white px-6 text-zinc-900 transition-all hover:border-zinc-400 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
       >
-        {isLoading ? (
+        {(isLoading || isAuthenticating) ? (
           <>
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-blue-600" />
             <span>Signing in...</span>
