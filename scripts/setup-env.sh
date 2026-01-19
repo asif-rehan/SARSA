@@ -10,7 +10,7 @@ DB_USER="saas_user"
 DB_PASSWORD="saas_password"
 DB_NAME="saas_dev"
 DB_HOST="localhost"
-DB_PORT="5433"
+DB_PORT="5432"
 
 DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
