@@ -385,7 +385,7 @@ The setup script adds these scripts to `package.json`:
 **TDD Methodology Confirmed:**
 - ✅ Write failing tests first when button missing (RED phase)
 - ✅ Implementation works when button exists (GREEN phase)
-- ✅ Validates complete user journey from landing to subscription
+- ✅ Validates complete landing-to-subscription user journey
 
 #### Tests Status
 - ✅ Unit tests passing (5/5)
