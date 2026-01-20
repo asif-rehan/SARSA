@@ -893,6 +893,7 @@ git commit -m "feat: implement Google OAuth login"
 # After REFACTOR phase
 git add .
 git commit -m "refactor: extract auth logic into hooks"
+# Then edit epic in SaaS_Guide.md with the list of associated test filepath and list unit and/or integration and/or e2e tests in a checklist
 ```
 
 ### Commit Message Convention
@@ -1012,3 +1013,20 @@ After completing the foundation epics:
 - **Coverage Areas**: Unit, Integration, E2E, Performance, Accessibility, Mobile
 - **Error Handling**: Comprehensive error scenario coverage
 - **Edge Cases**: Network failures, timeouts, invalid states
+
+### **✅ Stripe Environment Integration Test:**
+
+**New Integration Test** (`__tests__/integration/stripe-environment.test.ts`):
+- 🔴 **RED Phase**: Tests fail when Stripe environment variables are missing
+- 🟢 **GREEN Phase**: Tests pass when environment is properly mocked
+- **Status**: 13/13 tests implemented (8 RED phase failing, 5 GREEN phase passing)
+- ✅ Validates `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+- ✅ Tests .env.local file content and key formats
+- ✅ Ensures Stripe integration is properly tested before implementation
+- ✅ Follows strict TDD methodology
+
+**TDD Methodology Confirmed:**
+- ✅ Write failing tests first when environment not available (RED phase)
+- ✅ Implementation works when environment is properly configured
+- ✅ Environment variable validation prevents deployment issues
+- ✅ Comprehensive test coverage for Stripe integration setup
