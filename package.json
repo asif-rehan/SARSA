@@ -17,6 +17,7 @@
     "setup": "./scripts/setup-env.sh && npm run db:start && npm run db:migrate"
   },
   "dependencies": {
+    "@better-auth/stripe": "^1.4.17",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.3",
     "better-auth": "^1.4.15",

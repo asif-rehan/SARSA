@@ -166,8 +166,8 @@ export function SubscriptionPlans() {
     try {
       const session = await authClient.getSession();
       if (session?.data?.user) {
-        // Mock subscription data for testing - in real app this would come from database
-        // This will be overridden by test mocks when needed
+        // Better-Auth Stripe plugin will eventually provide subscription data
+        // For now, using mock data that matches the expected structure
         const mockSubscription = {
           plan: 'pro',
           status: 'active',
@@ -182,10 +182,9 @@ export function SubscriptionPlans() {
 
   const loadBillingHistory = async () => {
     try {
-      const response = await fetch('/api/billing-history');
-      const data = await response.json();
-      setBillingHistory(data.invoices || [
-        // Mock data for testing
+      // Better-Auth Stripe plugin will eventually provide billing history
+      // For now, using mock data for development
+      setBillingHistory([
         {
           id: 'inv_1',
           date: '2024-11-01',
