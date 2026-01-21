@@ -29,9 +29,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Map database subscription to expected format
+    const priceId = subscription.price_id || '';
     const subscriptionData = {
-      plan: subscription.price_id.includes('test_basic') ? 'basic' : 
-            subscription.price_id.includes('test_pro') ? 'pro' : 'enterprise',
+      plan: priceId.includes('test_basic') ? 'basic' : 
+            priceId.includes('test_pro') ? 'pro' : 'enterprise',
       status: subscription.status,
       currentPeriodEnd: subscription.current_period_end?.toISOString(),
       stripeSubscriptionId: subscription.stripe_subscription_id,

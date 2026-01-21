@@ -64,19 +64,20 @@ export async function POST(request: NextRequest) {
             .execute();
 
           // Create subscription record
+          const stripeSubscription = subscription as any;
           await db
             .insertInto('subscription')
             .values({
               id: `subscription_${Date.now()}`,
               user_id: userId,
-              stripe_subscription_id: subscription.id,
+              stripe_subscription_id: stripeSubscription.id,
               stripe_customer_id: session.customer as string,
-              status: subscription.status,
-              price_id: subscription.items.data[0].price.id,
-              quantity: subscription.items.data[0].quantity || 1,
-              cancel_at_period_end: subscription.cancel_at_period_end,
-              current_period_start: new Date(subscription.current_period_start * 1000),
-              current_period_end: new Date(subscription.current_period_end * 1000),
+              status: stripeSubscription.status,
+              price_id: stripeSubscription.items.data[0]?.price?.id,
+              quantity: stripeSubscription.items.data[0]?.quantity || 1,
+              cancel_at_period_end: stripeSubscription.cancel_at_period_end,
+              current_period_start: new Date(stripeSubscription.current_period_start * 1000),
+              current_period_end: new Date(stripeSubscription.current_period_end * 1000),
             })
             .execute();
         }
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as any;
         
         // Update subscription record
         await db
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as any;
         
         // Update subscription status to canceled
         await db

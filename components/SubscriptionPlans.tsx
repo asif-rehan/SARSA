@@ -65,9 +65,6 @@ export function SubscriptionPlans() {
       const sessionData = await authClient.getSession();
       
       if (sessionData?.data?.user) {
-        // Mock API call for user subscription (for testing)
-        global.fetch = global.fetch || vi.fn();
-        
         // Fetch user's subscription data
         try {
           const subscriptionResponse = await fetch('/api/user-subscription');

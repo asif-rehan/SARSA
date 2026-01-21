@@ -1,6 +1,11 @@
 import { betterAuth } from "better-auth";
 import { stripe } from "@better-auth/stripe";
 import { Pool } from "pg";
+import Stripe from "stripe";
+
+const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-12-15.clover",
+});
 
 export const auth = betterAuth({
   database: new Pool({
@@ -17,6 +22,8 @@ export const auth = betterAuth({
   },
   plugins: [
     stripe({
+      stripeClient: stripeInstance,
+      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       createCustomerOnSignUp: true,
       subscription: {
         enabled: true,
