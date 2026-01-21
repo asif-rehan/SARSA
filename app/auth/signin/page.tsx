@@ -28,6 +28,32 @@ export default function SignInPage() {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Link
+              href="/subscription"
+              className="flex h-12 w-full items-center justify-center rounded-full border-2 border-zinc-300 bg-blue-600 px-6 text-white transition-all hover:border-blue-400 hover:bg-blue-700 dark:border-blue-500 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+            >
+              Subscribe Now
+            </Link>
+
+            <Link
+              href=""
+              className="flex h-12 w-full items-center justify-center rounded-full border-2 border-zinc-300 bg-white px-6 text-zinc-900 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+            >
+              Back to Home
+            </Link>
+          </div>
+
+        </div>
+      </div>
+        </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-zinc-50 px-2 text-zinc-500 dark:bg-black dark:text-zinc-500">
+                or
+              </span>
+            </div>
+          </div>
+
           <Link
             href="/"
             className="flex h-12 w-full items-center justify-center rounded-full border-2 border-zinc-300 bg-white px-6 text-zinc-900 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
@@ -35,7 +61,7 @@ export default function SignInPage() {
             Back to Home
           </Link>
         </div>
-      </div>
+        </div>
     </main>
   );
 }

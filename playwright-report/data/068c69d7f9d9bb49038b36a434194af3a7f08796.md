@@ -1,0 +1,97 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - main [ref=e3]:
+    - banner [ref=e4]:
+      - heading "Build Your SaaS in Minutes" [level=1] [ref=e5]
+    - paragraph [ref=e7]: Start building your SaaS application today. Sign in to get started or create a new account to explore our powerful features.
+    - generic [ref=e8]:
+      - link "Sign In" [ref=e9] [cursor=pointer]:
+        - /url: /auth/signin
+      - link "Get Started" [ref=e10] [cursor=pointer]:
+        - /url: /auth/signup
+  - generic [active]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - navigation [ref=e16]:
+            - button "previous" [disabled] [ref=e17]:
+              - img "previous" [ref=e18]
+            - generic [ref=e20]:
+              - generic [ref=e21]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e22]:
+              - img "next" [ref=e23]
+          - img
+        - generic [ref=e25]:
+          - link "Next.js 16.1.3 (stale) Turbopack" [ref=e26] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e27]
+            - generic "There is a newer version (16.1.4) available, upgrade recommended!" [ref=e29]: Next.js 16.1.3 (stale)
+            - generic [ref=e30]: Turbopack
+          - img
+      - dialog "Build Error" [ref=e32]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e39]: Build Error
+              - generic [ref=e40]:
+                - button "Copy Error Info" [ref=e41] [cursor=pointer]:
+                  - img [ref=e42]
+                - link "Go to related documentation" [ref=e44] [cursor=pointer]:
+                  - /url: https://nextjs.org/docs/app/api-reference/directives/use-client
+                  - img [ref=e45]
+                - button "Attach Node.js inspector" [ref=e47] [cursor=pointer]:
+                  - img [ref=e48]
+            - generic [ref=e57]: Ecmascript file had an error
+          - generic [ref=e59]:
+            - generic [ref=e61]:
+              - img [ref=e63]
+              - generic [ref=e66]: ./components/SubscriptionPlans.tsx (1:27)
+              - button "Open in editor" [ref=e67] [cursor=pointer]:
+                - img [ref=e69]
+            - generic [ref=e72]:
+              - generic [ref=e73]: Ecmascript file had an error
+              - text: ">"
+              - generic [ref=e74]: 1 |
+              - text: import React,
+              - generic [ref=e75]: "{ useState"
+              - text: ","
+              - generic [ref=e76]: "useEffect }"
+              - text: from 'react';
+              - generic [ref=e77]: "|"
+              - text: ^^^^^^^^^
+              - generic [ref=e78]: 2 |
+              - text: import
+              - generic [ref=e79]: "{ loadStripe }"
+              - text: from '@stripe/stripe-js';
+              - generic [ref=e80]: 3 |
+              - text: import
+              - generic [ref=e81]: "{"
+              - text: Elements, CardElement,
+              - generic [ref=e82]: useStripe
+              - text: ","
+              - generic [ref=e83]: "useElements }"
+              - text: from '@stripe/react-stripe-js';
+              - generic [ref=e84]: 4 |
+              - text: import
+              - generic [ref=e85]: "{ authClient }"
+              - text: from '@/lib/auth-client';
+              - generic [ref=e86]:
+                - text: "You're importing a component that needs `useEffect`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `\"use client\"` directive. Learn more:"
+                - link "https://nextjs.org/docs/app/api-reference/directives/use-client" [ref=e87] [cursor=pointer]:
+                  - /url: https://nextjs.org/docs/app/api-reference/directives/use-client
+                - text: "Import trace: Server Component: ./components/SubscriptionPlans.tsx ./app/subscription/page.tsx"
+        - generic [ref=e88]: "1"
+        - generic [ref=e89]: "2"
+    - generic [ref=e94] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e95]:
+        - img [ref=e96]
+      - button "Open issues overlay" [ref=e100]:
+        - generic [ref=e101]:
+          - generic [ref=e102]: "0"
+          - generic [ref=e103]: "1"
+        - generic [ref=e104]: Issue
+  - alert [ref=e105]
+```
