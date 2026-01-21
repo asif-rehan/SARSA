@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Check } from 'lucide-react';
 
 interface SubscriptionPlan {
   id: string;
@@ -9,6 +13,7 @@ interface SubscriptionPlan {
   price: number;
   features: string[];
   priceId: string;
+  popular?: boolean;
 }
 
 interface UserSession {
@@ -38,6 +43,7 @@ const plans: SubscriptionPlan[] = [
     price: 29,
     priceId: 'price_1QdGHDB4dU1calXYtest_pro',
     features: ['All basic features', 'Priority support', '5 users', '20 projects', 'Advanced analytics'],
+    popular: true,
   },
   {
     id: 'enterprise',
@@ -172,8 +178,11 @@ export function SubscriptionPlans() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6" data-testid="subscription-plans">
-      <h2 className="text-3xl font-bold text-center mb-8">Subscription Plans</h2>
+    <div className="container mx-auto px-4 py-8" data-testid="subscription-plans">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold tracking-tight mb-4">Choose Your Plan</h1>
+        <p className="text-xl text-muted-foreground">Select the perfect plan for your needs</p>
+      </div>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -189,69 +198,96 @@ export function SubscriptionPlans() {
 
       {/* Authentication Status */}
       {!session?.user ? (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-semibold mb-2">Sign In Required</h3>
-          <p className="text-gray-700 mb-4">Please sign in to manage your subscription.</p>
-          <a
-            href="/auth/signin"
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            Sign In
-          </a>
-        </div>
+        <Card className="mb-8 max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Sign In Required</CardTitle>
+            <CardDescription>Please sign in to manage your subscription.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <a href="/auth/signin">Sign In</a>
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         /* Current Subscription Status */
         session.user.subscription && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold mb-2">Current Subscription</h3>
-            <p><strong>Plan:</strong> {session.user.subscription.plan}</p>
-            <p><strong>Status:</strong> {session.user.subscription.status}</p>
-            {session.user.subscription.currentPeriodEnd && (
-              <p><strong>Next Billing:</strong> {formatDate(session.user.subscription.currentPeriodEnd)}</p>
-            )}
-          </div>
+          <Card className="mb-8 max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle>Current Subscription</CardTitle>
+              <CardDescription>Your active subscription details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p><strong>Plan:</strong> {session.user.subscription.plan}</p>
+              <p><strong>Status:</strong> {session.user.subscription.status}</p>
+              {session.user.subscription.currentPeriodEnd && (
+                <p><strong>Next Billing:</strong> {formatDate(session.user.subscription.currentPeriodEnd)}</p>
+              )}
+            </CardContent>
+          </Card>
         )
       )}
 
       {/* Subscription Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" data-testid="subscription-plans-grid">
+      <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16" data-testid="subscription-plans-grid">
         {plans.map((plan) => (
-          <div key={plan.id} className="border rounded-lg p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
-            <p className="text-3xl font-bold mb-4">${plan.price}/month</p>
+          <Card 
+            key={plan.id} 
+            className={`relative ${
+              plan.popular ? 'border-primary shadow-lg scale-105' : ''
+            }`}
+          >
+            {plan.popular && (
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-primary text-primary-foreground">
+                  Most Popular
+                </Badge>
+              </div>
+            )}
             
-            <ul className="space-y-2 mb-6">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-
-            <button
-              onClick={() => handlePlanSelect(plan)}
-              disabled={
-                processingPlan === plan.id || 
-                (session?.user?.subscription?.plan === plan.id)
-              }
-              className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${getButtonStyle(plan)}`}
-              aria-label={`Select ${plan.name}`}
-              aria-describedby={`${plan.id}-description`}
-            >
-              {processingPlan === plan.id ? (
-                <span className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Processing...
-                </span>
-              ) : (
-                getButtonText(plan)
-              )}
-            </button>
-            <div id={`${plan.id}-description`} className="sr-only">
-              {plan.name} costs ${plan.price} per month and includes: {plan.features.join(', ')}
-            </div>
-          </div>
+            <CardHeader>
+              <CardTitle>{plan.name}</CardTitle>
+              <div className="flex items-baseline">
+                <span className="text-4xl font-bold">${plan.price}</span>
+                <span className="text-muted-foreground ml-1">/month</span>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              <ul className="space-y-3 mb-6">
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <Check className="h-4 w-4 text-primary mr-3" />
+                    <span className="text-sm">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <Button
+                onClick={() => handlePlanSelect(plan)}
+                disabled={
+                  processingPlan === plan.id || 
+                  (session?.user?.subscription?.plan === plan.id)
+                }
+                variant={plan.popular ? "default" : "outline"}
+                className="w-full"
+                aria-label={`Select ${plan.name}`}
+                aria-describedby={`${plan.id}-description`}
+              >
+                {processingPlan === plan.id ? (
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </span>
+                ) : (
+                  getButtonText(plan)
+                )}
+              </Button>
+              <div id={`${plan.id}-description`} className="sr-only">
+                {plan.name} costs ${plan.price} per month and includes: {plan.features.join(', ')}
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
@@ -336,31 +372,46 @@ function BillingHistory() {
 
   if (loading) {
     return (
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-4">Billing History</h3>
-        <div className="animate-pulse bg-gray-200 h-20 rounded"></div>
-      </div>
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Billing History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse bg-gray-200 h-20 rounded"></div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="mt-8">
-      <h3 className="text-xl font-semibold mb-4">Billing History</h3>
-      {invoices.length === 0 ? (
-        <p className="text-gray-600">No billing history available.</p>
-      ) : (
-        <div className="space-y-2">
-          {invoices.map((invoice) => (
-            <div key={invoice.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-              <span>${invoice.amount.toFixed(2)} - {new Date(invoice.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-              <span className={`px-2 py-1 rounded text-sm ${invoice.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {invoice.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle>Recent Invoices</CardTitle>
+        <CardDescription>Your billing history and invoices</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {invoices.length === 0 ? (
+          <p className="text-muted-foreground">No billing history available.</p>
+        ) : (
+          <div className="space-y-4">
+            {invoices.map((invoice) => (
+              <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium">Pro Plan - Monthly</p>
+                  <p className="text-sm text-muted-foreground">{new Date(invoice.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">${invoice.amount.toFixed(2)}</p>
+                  <Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'} className={invoice.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' : ''}>
+                    {invoice.status}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
