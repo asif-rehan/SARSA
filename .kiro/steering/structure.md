@@ -88,6 +88,12 @@
 - Integration: `feature-api.test.ts` or `database-feature.test.ts`
 - E2E: `user-journey.spec.ts`
 
+**Non-Interactive Test Execution (REQUIRED):**
+- **Unit/Integration**: `npm test -- --run` (never use `npm test` alone)
+- **E2E Tests**: `npm run test:e2e -- --headed=false` (never use `npm run test:e2e` alone)
+- **Agent/Automation Rule**: All automated processes MUST use non-interactive flags
+- **Rationale**: Prevents tests from hanging in watch mode or waiting for user input
+
 ## Configuration Files
 
 **Build & Development:**

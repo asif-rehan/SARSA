@@ -2,10 +2,21 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, CreditCard, LayoutDashboard } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-background to-muted">
+      {/* Header with theme toggle */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">SaaS Platform</h2>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">

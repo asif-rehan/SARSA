@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { User, CreditCard, Settings } from 'lucide-react';
 
 export default function Dashboard({ session }: { session: { user?: { name: string, email: string, image?: string } } }) {
@@ -24,6 +25,7 @@ export default function Dashboard({ session }: { session: { user?: { name: strin
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <Avatar className="h-10 w-10">
                 <AvatarImage src={user.image} alt={user.name || user.email} />
                 <AvatarFallback>

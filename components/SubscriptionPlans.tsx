@@ -5,6 +5,7 @@ import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Check } from 'lucide-react';
 
 interface SubscriptionPlan {
@@ -178,11 +179,22 @@ export function SubscriptionPlans() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8" data-testid="subscription-plans">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold tracking-tight mb-4">Choose Your Plan</h1>
-        <p className="text-xl text-muted-foreground">Select the perfect plan for your needs</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Header with theme toggle */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Subscription Plans</h2>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8" data-testid="subscription-plans">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Choose Your Plan</h1>
+          <p className="text-xl text-muted-foreground">Select the perfect plan for your needs</p>
+        </div>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -342,6 +354,7 @@ export function SubscriptionPlans() {
           aria-invalid="false"
           role="textbox"
         />
+      </div>
       </div>
     </div>
   );
