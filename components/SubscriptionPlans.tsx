@@ -7,6 +7,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Check } from 'lucide-react';
+import { LoadingButton } from '@/components/loading/loading-button';
+import { SubscriptionSkeleton } from '@/components/loading/subscription-skeleton';
+import { HoverCard } from '@/components/interactions/hover-card';
+import { FadeIn } from '@/components/transitions/fade-in';
+import { StaggerContainer, StaggerItem } from '@/components/interactions/stagger-container';
+import { FormStatus } from '@/components/forms/form-status';
 
 interface SubscriptionPlan {
   id: string;
@@ -169,139 +175,141 @@ export function SubscriptionPlans() {
   };
 
   if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      </div>
-    );
+    return <SubscriptionSkeleton />;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with theme toggle */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
+      {/* Mobile-optimized header */}
+      <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+        <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Subscription Plans</h2>
+            <h2 className="text-xl sm:text-2xl font-bold truncate">Subscription Plans</h2>
             <ThemeToggle />
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8" data-testid="subscription-plans">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Choose Your Plan</h1>
-          <p className="text-xl text-muted-foreground">Select the perfect plan for your needs</p>
-        </div>
+      <div className="container mx-auto px-4 py-6 sm:py-8" data-testid="subscription-plans">
+        <FadeIn>
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3 sm:mb-4">
+              Choose Your Plan
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground px-4">
+              Select the perfect plan for your needs
+            </p>
+          </div>
+        </FadeIn>
 
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          {error}
-        </div>
-      )}
+        <FormStatus 
+          error={error}
+          success={success}
+          onClearError={() => setError('')}
+          onClearSuccess={() => setSuccess('')}
+        />
 
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-          {success}
-        </div>
-      )}
-
-      {/* Authentication Status */}
+      {/* Authentication Status - Mobile optimized */}
       {!session?.user ? (
-        <Card className="mb-8 max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Sign In Required</CardTitle>
-            <CardDescription>Please sign in to manage your subscription.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <a href="/auth/signin">Sign In</a>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        /* Current Subscription Status */
-        session.user.subscription && (
-          <Card className="mb-8 max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle>Current Subscription</CardTitle>
-              <CardDescription>Your active subscription details</CardDescription>
+        <FadeIn delay={0.2}>
+          <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Sign In Required</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
+                Please sign in to manage your subscription.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p><strong>Plan:</strong> {session.user.subscription.plan}</p>
-              <p><strong>Status:</strong> {session.user.subscription.status}</p>
-              {session.user.subscription.currentPeriodEnd && (
-                <p><strong>Next Billing:</strong> {formatDate(session.user.subscription.currentPeriodEnd)}</p>
-              )}
+            <CardContent>
+              <Button asChild className="w-full sm:w-auto min-h-[48px]">
+                <a href="/auth/signin">Sign In</a>
+              </Button>
             </CardContent>
           </Card>
+        </FadeIn>
+      ) : (
+        /* Current Subscription Status - Mobile optimized */
+        session.user.subscription && (
+          <FadeIn delay={0.2}>
+            <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl">Current Subscription</CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  Your active subscription details
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm sm:text-base">
+                <p><strong>Plan:</strong> {session.user.subscription.plan}</p>
+                <p><strong>Status:</strong> {session.user.subscription.status}</p>
+                {session.user.subscription.currentPeriodEnd && (
+                  <p><strong>Next Billing:</strong> {formatDate(session.user.subscription.currentPeriodEnd)}</p>
+                )}
+              </CardContent>
+            </Card>
+          </FadeIn>
         )
       )}
 
-      {/* Subscription Plans Grid */}
-      <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16" data-testid="subscription-plans-grid">
+      {/* Subscription Plans Grid - Mobile-first responsive */}
+      <StaggerContainer 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto mb-12 sm:mb-16" 
+        data-testid="subscription-plans-grid"
+      >
         {plans.map((plan) => (
-          <Card 
-            key={plan.id} 
-            className={`relative ${
-              plan.popular ? 'border-primary shadow-lg scale-105' : ''
-            }`}
-          >
-            {plan.popular && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground">
-                  Most Popular
-                </Badge>
-              </div>
-            )}
-            
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <div className="flex items-baseline">
-                <span className="text-4xl font-bold">${plan.price}</span>
-                <span className="text-muted-foreground ml-1">/month</span>
-              </div>
-            </CardHeader>
-            
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-center">
-                    <Check className="h-4 w-4 text-primary mr-3" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Button
-                onClick={() => handlePlanSelect(plan)}
-                disabled={
-                  processingPlan === plan.id || 
-                  (session?.user?.subscription?.plan === plan.id)
-                }
-                variant={plan.popular ? "default" : "outline"}
-                className="w-full"
-                aria-label={`Select ${plan.name}`}
-                aria-describedby={`${plan.id}-description`}
+          <StaggerItem key={plan.id}>
+            <HoverCard>
+              <Card 
+                className={`relative h-full transition-all duration-200 ${
+                  plan.popular ? 'border-primary shadow-lg scale-[1.02] sm:scale-105' : 'hover:shadow-md'
+                }`}
               >
-                {processingPlan === plan.id ? (
-                  <span className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Processing...
-                  </span>
-                ) : (
-                  getButtonText(plan)
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-primary text-primary-foreground px-3 py-1">
+                      Most Popular
+                    </Badge>
+                  </div>
                 )}
-              </Button>
-              <div id={`${plan.id}-description`} className="sr-only">
-                {plan.name} costs ${plan.price} per month and includes: {plan.features.join(', ')}
-              </div>
-            </CardContent>
-          </Card>
+                
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl sm:text-2xl">{plan.name}</CardTitle>
+                  <div className="flex items-baseline">
+                    <span className="text-3xl sm:text-4xl font-bold">${plan.price}</span>
+                    <span className="text-muted-foreground ml-1 text-sm sm:text-base">/month</span>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-3 mb-6 flex-1">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <Check className="h-4 w-4 text-primary mr-3 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm sm:text-base">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  {/* Touch-friendly button with minimum 48px height */}
+                  <LoadingButton
+                    onClick={() => handlePlanSelect(plan)}
+                    loading={processingPlan === plan.id}
+                    loadingText="Processing..."
+                    disabled={session?.user?.subscription?.plan === plan.id}
+                    variant={plan.popular ? "default" : "outline"}
+                    className="w-full min-h-[48px] text-base font-medium"
+                    aria-label={`Select ${plan.name}`}
+                    aria-describedby={`${plan.id}-description`}
+                  >
+                    {getButtonText(plan)}
+                  </LoadingButton>
+                  <div id={`${plan.id}-description`} className="sr-only">
+                    {plan.name} costs ${plan.price} per month and includes: {plan.features.join(', ')}
+                  </div>
+                </CardContent>
+              </Card>
+            </HoverCard>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
 
       {/* User Info for Debugging */}
       {session?.user && (
@@ -480,9 +488,9 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 className="text-xl font-semibold mb-4">Enter Payment Details</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4">Enter Payment Details</h3>
         
         {validationErrors.length > 0 && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -494,44 +502,50 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">Card Number</label>
+            <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
+              Card Number
+            </label>
             <input
               type="text"
               id="cardNumber"
               name="cardNumber"
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-gray-300 rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="1234 5678 9012 3456"
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="expiry" className="block text-sm font-medium text-gray-700">Expiry Date</label>
+              <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
+                Expiry Date
+              </label>
               <input
                 type="text"
                 id="expiry"
                 name="expiry"
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                className="w-full border border-gray-300 rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="MM/YY"
               />
             </div>
             <div>
-              <label htmlFor="cvv" className="block text-sm font-medium text-gray-700">CVV</label>
+              <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
+                CVV
+              </label>
               <input
                 type="text"
                 id="cvv"
                 name="cvv"
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                className="w-full border border-gray-300 rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="123"
               />
             </div>
           </div>
 
-          <div className="flex space-x-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="flex-1 py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium min-h-[48px]"
               disabled={processing}
             >
               Cancel
@@ -539,7 +553,7 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
             <button
               type="submit"
               disabled={processing}
-              className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium min-h-[48px]"
             >
               {processing ? 'Processing...' : 'Complete Subscription'}
             </button>

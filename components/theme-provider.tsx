@@ -28,15 +28,24 @@ export function ThemeProvider({
   storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(() => {
-    try {
-      return (localStorage?.getItem(storageKey) as Theme) || defaultTheme
-    } catch {
-      return defaultTheme
-    }
-  })
+  const [theme, setTheme] = React.useState<Theme>(defaultTheme)
+  const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
+    setMounted(true)
+    try {
+      const storedTheme = localStorage?.getItem(storageKey) as Theme
+      if (storedTheme) {
+        setTheme(storedTheme)
+      }
+    } catch {
+      // Silently fail if localStorage is not available
+    }
+  }, [storageKey])
+
+  React.useEffect(() => {
+    if (!mounted) return
+
     const root = window.document.documentElement
 
     root.classList.remove("light", "dark")
@@ -52,7 +61,7 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme)
-  }, [theme])
+  }, [theme, mounted])
 
   const value = {
     theme,
@@ -64,6 +73,15 @@ export function ThemeProvider({
       }
       setTheme(theme)
     },
+  }
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <ThemeProviderContext.Provider {...props} value={value}>
+        {children}
+      </ThemeProviderContext.Provider>
+    )
   }
 
   return (
