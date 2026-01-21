@@ -29,6 +29,12 @@ export default function Home() {
           >
             Get Started
           </Link>
+          <Link
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-green-600 px-8 text-white transition-colors hover:bg-green-700 md:w-[180px]"
+            href="/subscription"
+          >
+            Subscribe
+          </Link>
         </div>
       </main>
     </div>

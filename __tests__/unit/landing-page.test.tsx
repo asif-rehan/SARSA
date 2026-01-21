@@ -33,4 +33,40 @@ describe('Landing Page', () => {
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByRole('banner')).toBeInTheDocument();
   });
+
+  // Task 2.11: Subscribe button unit tests
+  describe('Subscribe Button', () => {
+    it('should render Subscribe CTA button with visibility and clickability', () => {
+      render(<Home />);
+      
+      const subscribeButton = screen.getByRole('link', { name: /subscribe/i });
+      expect(subscribeButton).toBeInTheDocument();
+      expect(subscribeButton).toBeVisible();
+    });
+
+    it('should route to /subscription page', () => {
+      render(<Home />);
+      
+      const subscribeButton = screen.getByRole('link', { name: /subscribe/i });
+      expect(subscribeButton).toHaveAttribute('href', '/subscription');
+    });
+
+    it('should have accessible ARIA labels', () => {
+      render(<Home />);
+      
+      const subscribeButton = screen.getByRole('link', { name: /subscribe/i });
+      expect(subscribeButton).toHaveAccessibleName();
+      // Should be accessible to screen readers
+      expect(subscribeButton).toBeInTheDocument();
+    });
+
+    it('should have responsive behavior on mobile devices', () => {
+      render(<Home />);
+      
+      const subscribeButton = screen.getByRole('link', { name: /subscribe/i });
+      // Check for responsive classes that ensure mobile compatibility
+      expect(subscribeButton).toHaveClass('w-full');
+      expect(subscribeButton).toHaveClass('md:w-[180px]');
+    });
+  });
 });
