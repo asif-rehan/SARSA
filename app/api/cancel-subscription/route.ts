@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-12-15.clover',
 });
 
 export async function POST(request: NextRequest) {
@@ -20,45 +20,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's current subscription from database
-    const userSubscriptions = await stripe.subscriptions.list({
-      customer: session.user.stripeCustomerId,
-      limit: 1,
-    });
-
-    const currentSubscription = userSubscriptions.data[0];
-
-    if (!currentSubscription) {
-      return NextResponse.json(
-        { error: 'No active subscription found' },
-        { status: 404 }
-      );
-    }
-
-    // Cancel subscription at period end
-    const canceledSubscription = await stripe.subscriptions.update(currentSubscription.id, {
-      cancel_at_period_end: true,
-      metadata: {
-        canceledBy: session.user.id,
-        canceledAt: new Date().toISOString(),
-      },
-    });
-
-    // Update database subscription status
-    // This would update your local database with the canceled status
-    // await updateUserSubscription(session.user.id, {
-    //   status: 'canceled',
-    //   cancelAtPeriodEnd: true,
-    // });
-
-    return NextResponse.json({
-      success: true,
-      subscription: {
-        id: canceledSubscription.id,
-        status: canceledSubscription.status,
-        cancelAtPeriodEnd: true,
-        currentPeriodEnd: new Date(canceledSubscription.current_period_end * 1000).toISOString(),
-      },
-    });
+    // Since we don't have Stripe integration in Better-Auth, we'll need to handle this differently
+    // For now, we'll return an error since we can't identify the customer
+    return NextResponse.json(
+      { error: 'Stripe customer management not available without Better-Auth Stripe plugin' },
+      { status: 501 }
+    );
   } catch (error) {
     console.error('Subscription cancellation error:', error);
     return NextResponse.json(

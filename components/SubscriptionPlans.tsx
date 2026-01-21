@@ -45,7 +45,7 @@ const plans: SubscriptionPlan[] = [
   },
 ];
 
-function PaymentForm({ onSuccess, onError }: {
+function PaymentForm({ selectedPlan, onSuccess, onError }: {
   selectedPlan: SubscriptionPlan;
   onSuccess: () => void;
   onError: (error: string) => void;

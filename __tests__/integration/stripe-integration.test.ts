@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { setupServer } from 'msw/node';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 // Mock Stripe module
 vi.mock('stripe', () => ({
@@ -194,16 +194,13 @@ describe('Stripe Integration Tests', () => {
 
     it('should update subscription status in database', async () => {
       server.use(
-        rest.put('/api/subscriptions/:subscriptionId', (req, res, ctx) => {
-          return res(
-            ctx.status(200),
-            ctx.json({
-              id: 'sub_test123',
-              status: 'active',
-              plan: 'pro',
-              userId: 'user_123',
-            })
-          );
+        http.put('/api/subscriptions/:subscriptionId', () => {
+          return HttpResponse.json({
+            id: 'sub_test123',
+            status: 'active',
+            plan: 'pro',
+            userId: 'user_123',
+          });
         })
       );
 

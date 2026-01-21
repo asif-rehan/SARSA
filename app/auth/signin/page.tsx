@@ -37,7 +37,7 @@ export default function SignInPage() {
             </Link>
 
             <Link
-              href=""
+              href="/"
               className="flex h-12 w-full items-center justify-center rounded-full border-2 border-zinc-300 bg-white px-6 text-zinc-900 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
             >
               Back to Home
@@ -46,22 +46,6 @@ export default function SignInPage() {
 
         </div>
       </div>
-        </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-zinc-50 px-2 text-zinc-500 dark:bg-black dark:text-zinc-500">
-                or
-              </span>
-            </div>
-          </div>
-
-          <Link
-            href="/"
-            className="flex h-12 w-full items-center justify-center rounded-full border-2 border-zinc-300 bg-white px-6 text-zinc-900 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
-          >
-            Back to Home
-          </Link>
-        </div>
-        </div>
     </main>
   );
 }

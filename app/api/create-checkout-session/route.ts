@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-12-15.clover',
 });
 
 export async function POST(request: NextRequest) {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe Checkout Session
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer_email: session.user.email,
+      customer_email: session.user.email!,
       billing_address_collection: 'auto',
       line_items: [
         {

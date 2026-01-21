@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+import { sql } from 'kysely';
 
 // Test the actual database and auth configuration
 describe('Live Database & Auth Integration Tests', () => {
@@ -21,8 +22,8 @@ describe('Live Database & Auth Integration Tests', () => {
   describe('Database Connection', () => {
     it('should connect to the actual database', async () => {
       try {
-        const result = await realDb.db.executeQuery('SELECT 1 as test_connection');
-        expect(result.rows).toEqual([{ test_connection: 1 }]);
+        const result = await realDb.db.selectFrom(sql`(SELECT 1 as test_connection)`.as('test')).selectAll().execute();
+        expect(result).toEqual([{ test_connection: 1 }]);
         console.log('✅ Database connection successful');
       } catch (error) {
         console.error('❌ Database connection failed:', error);
@@ -32,13 +33,14 @@ describe('Live Database & Auth Integration Tests', () => {
 
     it('should have Better-Auth tables', async () => {
       try {
-        const result = await realDb.db.executeQuery(`
-          SELECT tablename FROM pg_tables 
-          WHERE schemaname = 'public' 
-          AND tablename IN ('user', 'session', 'account', 'verification')
-        `);
+        const result = await realDb.db
+          .selectFrom('pg_tables')
+          .select('tablename')
+          .where('schemaname', '=', 'public')
+          .where('tablename', 'in', ['user', 'session', 'account', 'verification'])
+          .execute();
         
-        const tableNames = result.rows.map((row: any) => row.tablename);
+        const tableNames = result.map((row: any) => row.tablename);
         const expectedTables = ['user', 'session', 'account', 'verification'];
         
         expect(tableNames).toEqual(expect.arrayContaining(expectedTables));
@@ -52,25 +54,27 @@ describe('Live Database & Auth Integration Tests', () => {
     it('should verify Better-Auth schema structure', async () => {
       try {
         // Check user table structure
-        const userSchema = await realDb.db.executeQuery(`
-          SELECT column_name, data_type, is_nullable 
-          FROM information_schema.columns 
-          WHERE table_name = 'user' AND table_schema = 'public'
-          ORDER BY ordinal_position
-        `);
+        const userSchema = await realDb.db
+          .selectFrom('information_schema.columns')
+          .select(['column_name', 'data_type', 'is_nullable'])
+          .where('table_name', '=', 'user')
+          .where('table_schema', '=', 'public')
+          .orderBy('ordinal_position')
+          .execute();
         
-        expect(userSchema.rows.length).toBeGreaterThan(0);
+        expect(userSchema.length).toBeGreaterThan(0);
         console.log('✅ User table schema verified');
         
         // Check session table structure
-        const sessionSchema = await realDb.db.executeQuery(`
-          SELECT column_name, data_type, is_nullable 
-          FROM information_schema.columns 
-          WHERE table_name = 'session' AND table_schema = 'public'
-          ORDER BY ordinal_position
-        `);
+        const sessionSchema = await realDb.db
+          .selectFrom('information_schema.columns')
+          .select(['column_name', 'data_type', 'is_nullable'])
+          .where('table_name', '=', 'session')
+          .where('table_schema', '=', 'public')
+          .orderBy('ordinal_position')
+          .execute();
         
-        expect(sessionSchema.rows.length).toBeGreaterThan(0);
+        expect(sessionSchema.length).toBeGreaterThan(0);
         console.log('✅ Session table schema verified');
       } catch (error) {
         console.error('❌ Schema structure verification failed:', error);
@@ -180,11 +184,11 @@ describe('Live Database & Auth Integration Tests', () => {
   describe('Docker Container Status', () => {
     it('should check if PostgreSQL container is running', async () => {
       try {
-        // Test database connectivity
-        const result = await realDb.db.executeQuery('SELECT version()');
-        expect(result.rows[0].version).toContain('PostgreSQL');
+        // Test database connectivity using proper Kysely query
+        const result = await realDb.db.selectFrom(sql`(SELECT version())`.as('version_check')).selectAll().execute();
+        expect(result[0].version).toContain('PostgreSQL');
         console.log('✅ PostgreSQL container is running and accessible');
-        console.log(`   Version: ${result.rows[0].version.split(',')[0]}`);
+        console.log(`   Version: ${result[0].version.split(',')[0]}`);
       } catch (error) {
         console.error('❌ PostgreSQL container check failed:', error);
         console.error('   Make sure PostgreSQL container is running: npm run db:start');

@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { setupServer } from 'msw/node';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import GoogleLoginButton from '@/components/GoogleLoginButton';
 import { redirect } from 'next/navigation';
 
@@ -26,20 +26,17 @@ describe('Dashboard Routing Integration Tests (RED Phase)', () => {
     it('should initiate Google OAuth with dashboard callback URL', async () => {
       // Mock OAuth endpoint
       server.use(
-        rest.post('/api/auth/sign-in/social', (req, res, ctx) => {
-          // Verify the request includes correct callbackURL
-          const body = req.body as any;
+        http.post('/api/auth/sign-in/social', async ({ request }) => {
+          const body = await request.json() as any;
           expect(body.callbackURL).toBe('/dashboard');
           expect(body.provider).toBe('google');
           
-          return res(
-            ctx.json({
-              data: {
-                url: 'https://accounts.google.com/oauth/authorize?...'
-              },
-              error: null
-            })
-          );
+          return HttpResponse.json({
+            data: {
+              url: 'https://accounts.google.com/oauth/authorize?...'
+            },
+            error: null
+          });
         })
       );
 
@@ -57,11 +54,13 @@ describe('Dashboard Routing Integration Tests (RED Phase)', () => {
     it('should handle OAuth callback and redirect to dashboard', async () => {
       // Mock successful OAuth callback
       server.use(
-        rest.get('/api/auth/callback/google', (req, res, ctx) => {
-          return res(
-            ctx.status(302),
-            ctx.set('Location', '/dashboard')
-          );
+        http.get('/api/auth/callback/google', () => {
+          return new HttpResponse(null, {
+            status: 302,
+            headers: {
+              'Location': '/dashboard'
+            }
+          });
         })
       );
 
@@ -76,10 +75,10 @@ describe('Dashboard Routing Integration Tests (RED Phase)', () => {
     it('should redirect to sign-in on OAuth failure', async () => {
       // Mock OAuth failure
       server.use(
-        rest.get('/api/auth/callback/google', (req, res, ctx) => {
-          return res(
-            ctx.status(400),
-            ctx.json({ error: 'OAuth failed' })
+        http.get('/api/auth/callback/google', () => {
+          return HttpResponse.json(
+            { error: 'OAuth failed' },
+            { status: 400 }
           );
         })
       );
@@ -97,18 +96,16 @@ describe('Dashboard Routing Integration Tests (RED Phase)', () => {
     it('should allow access to dashboard for authenticated users', async () => {
       // Mock authenticated session
       server.use(
-        rest.get('/api/auth/session', (req, res, ctx) => {
-          return res(
-            ctx.json({
-              data: {
-                user: {
-                  id: 'test-user-id',
-                  name: 'Test User',
-                  email: 'test@example.com'
-                }
+        http.get('/api/auth/session', () => {
+          return HttpResponse.json({
+            data: {
+              user: {
+                id: 'test-user-id',
+                name: 'Test User',
+                email: 'test@example.com'
               }
-            })
-          );
+            }
+          });
         })
       );
 
@@ -120,22 +117,22 @@ describe('Dashboard Routing Integration Tests (RED Phase)', () => {
     it('should redirect unauthenticated users from dashboard to sign-in', async () => {
       // Mock no session
       server.use(
-        rest.get('/api/auth/session', (req, res, ctx) => {
-          return res(
-            ctx.json({
-              data: null
-            })
-          );
+        http.get('/api/auth/session', () => {
+          return HttpResponse.json({
+            data: null
+          });
         })
       );
 
       // Mock dashboard page redirect logic
       server.use(
-        rest.get('/dashboard', (req, res, ctx) => {
-          return res(
-            ctx.status(302),
-            ctx.set('Location', '/auth/signin')
-          );
+        http.get('/dashboard', () => {
+          return new HttpResponse(null, {
+            status: 302,
+            headers: {
+              'Location': '/auth/signin'
+            }
+          });
         })
       );
 
