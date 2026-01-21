@@ -90,7 +90,7 @@
 
 **Non-Interactive Test Execution (REQUIRED):**
 - **Unit/Integration**: `npm test -- --run` (never use `npm test` alone)
-- **E2E Tests**: `npm run test:e2e -- --headed=false` (never use `npm run test:e2e` alone)
+- **E2E Tests**: `npm run test:e2e` (runs headless by default, never use `npm run test:e2e -- --headed`)
 - **Agent/Automation Rule**: All automated processes MUST use non-interactive flags
 - **Rationale**: Prevents tests from hanging in watch mode or waiting for user input
 

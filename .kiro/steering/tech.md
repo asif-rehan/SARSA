@@ -38,12 +38,12 @@
 - E2E tests: `e2e/`
 
 **Test Execution:**
-- **CRITICAL**: Always run tests non-interactively using `--run` flag for unit tests and `--headed=false` for e2e tests
+- **CRITICAL**: Always run tests non-interactively using `--run` flag for unit tests and headless mode for e2e tests
 - **Unit/Integration**: Use `npm test -- --run` to avoid watch mode and ensure tests exit properly
-- **E2E Tests**: Use `npm run test:e2e -- --headed=false` to run in headless mode without browser UI
+- **E2E Tests**: Use `npm run test:e2e` (runs headless by default) or `npm run test:e2e -- --project=chromium` for specific browser
 - **Agent Requirement**: All automated processes MUST use non-interactive flags to prevent hanging
 - **CI/CD Compatibility**: Non-interactive flags ensure tests complete and exit properly in automated environments
-- **Never use**: Interactive modes (`npm test` without `--run`, `npm run test:e2e` without `--headed=false`) in automated workflows
+- **Never use**: Interactive modes (`npm test` without `--run`, `npm run test:e2e -- --headed`) in automated workflows
 
 ## Development Commands
 
@@ -78,7 +78,7 @@ npm run db:migrate   # Run Better-Auth migrations
 ```bash
 npm test -- --run    # Run unit/integration tests (non-interactive)
 npm run test:ui      # Run tests with Vitest UI (interactive - avoid in automation)
-npm run test:e2e -- --headed=false  # Run Playwright e2e tests (non-interactive)
+npm run test:e2e     # Run Playwright e2e tests (headless by default)
 npm run test:e2e:ui  # Run e2e tests with UI (interactive - avoid in automation)
 ```
 
@@ -86,11 +86,11 @@ npm run test:e2e:ui  # Run e2e tests with UI (interactive - avoid in automation)
 ```bash
 # Run all tests non-interactively
 npm test -- --run                    # Unit/integration tests
-npm run test:e2e -- --headed=false   # E2E tests headless
-npm run test:e2e -- --ui=false       # E2E tests without UI
+npm run test:e2e                     # E2E tests headless (default)
+npm run test:e2e -- --project=chromium  # E2E tests specific browser
 
 # Combined test execution for full validation
-npm test -- --run && npm run test:e2e -- --headed=false
+npm test -- --run && npm run test:e2e
 ```
 
 **Full Setup Command:**

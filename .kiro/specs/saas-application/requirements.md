@@ -205,6 +205,8 @@ This document specifies the requirements for a comprehensive SaaS application bu
 6. THE SaaS_Application SHALL include performance tests for page load times and API responses
 7. THE SaaS_Application SHALL include accessibility tests for WCAG compliance
 8. THE SaaS_Application SHALL include mobile responsiveness tests across multiple viewports
+9. **THE SaaS_Application SHALL execute all tests non-interactively using `npm test -- --run` for unit/integration tests and `npm run test:e2e` for end-to-end tests (headless by default)**
+10. **WHEN running automated testing processes, THE SaaS_Application SHALL never use interactive test modes that wait for user input or file changes**
 
 ### Requirement 13: Security and Data Protection
 
