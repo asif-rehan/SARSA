@@ -2,6 +2,7 @@
 
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,14 +10,58 @@ import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { User, CreditCard, Settings } from 'lucide-react';
 
-export default function Dashboard({ session }: { session: { user?: { name: string, email: string, image?: string } } }) {
+interface UserSession {
+  user: {
+    id: string;
+    name?: string | null;
+    email: string;
+    image?: string | null;
+  };
+}
+
+export default function Dashboard() {
   const router = useRouter();
-  const user = session?.user || { name: 'Guest', email: '' };
+  const [session, setSession] = useState<UserSession | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const sessionData = await authClient.getSession();
+        if (sessionData?.data?.user) {
+          setSession({ user: sessionData.data.user });
+        } else {
+          router.push('/auth/signin');
+        }
+      } catch (error) {
+        console.error('Failed to load session:', error);
+        router.push('/auth/signin');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSession();
+  }, [router]);
 
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push('/');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null; // Will redirect to signin
+  }
+
+  const user = session.user;
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,7 +79,7 @@ export default function Dashboard({ session }: { session: { user?: { name: strin
               
               <div className="flex items-center space-x-3">
                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
-                  <AvatarImage src={user.image} alt={user.name || user.email} />
+                  <AvatarImage src={user.image || undefined} alt={user.name || user.email} />
                   <AvatarFallback className="text-xs sm:text-sm">
                     {user.name?.[0] || user.email[0] || 'G'}
                   </AvatarFallback>
@@ -64,7 +109,7 @@ export default function Dashboard({ session }: { session: { user?: { name: strin
       <main className="container mx-auto px-4 py-6 sm:py-8">
         {/* Mobile-optimized dashboard cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Card className="h-full hover:shadow-md transition-shadow">
+          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push('/profile')}>
             <CardHeader className="pb-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-lg bg-primary/10">
@@ -80,7 +125,7 @@ export default function Dashboard({ session }: { session: { user?: { name: strin
             </CardHeader>
           </Card>
           
-          <Card className="h-full hover:shadow-md transition-shadow">
+          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push('/subscription')}>
             <CardHeader className="pb-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-lg bg-primary/10">
@@ -96,7 +141,7 @@ export default function Dashboard({ session }: { session: { user?: { name: strin
             </CardHeader>
           </Card>
           
-          <Card className="h-full hover:shadow-md transition-shadow">
+          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push('/settings')}>
             <CardHeader className="pb-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-lg bg-primary/10">

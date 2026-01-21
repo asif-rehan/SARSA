@@ -9,6 +9,7 @@
 
 **Authentication & Database:**
 - Better-Auth 1.4.15 for authentication and OAuth
+- **CRITICAL**: Always use Better-Auth plugins when available for extended functionality
 - PostgreSQL 16 (Docker containerized)
 - Kysely 0.28.10 as query builder
 
