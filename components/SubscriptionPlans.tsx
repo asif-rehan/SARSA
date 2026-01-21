@@ -313,10 +313,10 @@ export function SubscriptionPlans() {
 
       {/* User Info for Debugging */}
       {session?.user && (
-        <div className="bg-gray-50 border rounded-lg p-4 mt-8">
-          <h4 className="font-semibold mb-2">Debug Info</h4>
-          <p><strong>User:</strong> {session.user.email}</p>
-          <p><strong>Subscription:</strong> {session.user.subscription ? JSON.stringify(session.user.subscription) : 'None'}</p>
+        <div className="bg-muted border rounded-lg p-4 mt-8">
+          <h4 className="font-semibold mb-2 text-foreground">Debug Info</h4>
+          <p className="text-foreground"><strong>User:</strong> {session.user.email}</p>
+          <p className="text-foreground"><strong>Subscription:</strong> {session.user.subscription ? JSON.stringify(session.user.subscription) : 'None'}</p>
         </div>
       )}
 
@@ -398,7 +398,7 @@ function BillingHistory() {
           <CardTitle>Billing History</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse bg-gray-200 h-20 rounded"></div>
+          <div className="animate-pulse bg-muted h-20 rounded"></div>
         </CardContent>
       </Card>
     );
@@ -423,7 +423,7 @@ function BillingHistory() {
                 </div>
                 <div className="text-right">
                   <p className="font-medium">${invoice.amount.toFixed(2)}</p>
-                  <Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'} className={invoice.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' : ''}>
+                  <Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'} className={invoice.status === 'paid' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800' : ''}>
                     {invoice.status}
                   </Badge>
                 </div>
@@ -488,12 +488,12 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <h3 className="text-lg sm:text-xl font-semibold mb-4">Enter Payment Details</h3>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-background border rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-lg">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4 text-foreground">Enter Payment Details</h3>
         
         {validationErrors.length > 0 && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded mb-4">
             {validationErrors.map((error, index) => (
               <div key={index}>{error}</div>
             ))}
@@ -502,40 +502,40 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="cardNumber" className="block text-sm font-medium text-foreground mb-1">
               Card Number
             </label>
             <input
               type="text"
               id="cardNumber"
               name="cardNumber"
-              className="w-full border border-gray-300 rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full border border-input bg-background text-foreground rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-ring focus:border-ring placeholder:text-muted-foreground"
               placeholder="1234 5678 9012 3456"
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="expiry" className="block text-sm font-medium text-foreground mb-1">
                 Expiry Date
               </label>
               <input
                 type="text"
                 id="expiry"
                 name="expiry"
-                className="w-full border border-gray-300 rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full border border-input bg-background text-foreground rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-ring focus:border-ring placeholder:text-muted-foreground"
                 placeholder="MM/YY"
               />
             </div>
             <div>
-              <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="cvv" className="block text-sm font-medium text-foreground mb-1">
                 CVV
               </label>
               <input
                 type="text"
                 id="cvv"
                 name="cvv"
-                className="w-full border border-gray-300 rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full border border-input bg-background text-foreground rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-ring focus:border-ring placeholder:text-muted-foreground"
                 placeholder="123"
               />
             </div>
@@ -545,7 +545,7 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium min-h-[48px]"
+              className="flex-1 py-3 px-4 border border-input bg-background text-foreground rounded-md hover:bg-accent hover:text-accent-foreground font-medium min-h-[48px] transition-colors"
               disabled={processing}
             >
               Cancel
@@ -553,7 +553,7 @@ function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps)
             <button
               type="submit"
               disabled={processing}
-              className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium min-h-[48px]"
+              className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 font-medium min-h-[48px] transition-colors"
             >
               {processing ? 'Processing...' : 'Complete Subscription'}
             </button>
