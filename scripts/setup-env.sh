@@ -26,12 +26,17 @@ BETTER_AUTH_URL=${BETTER_AUTH_URL}
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
+RESEND_API_KEY=your_resend_api_key
+
+# Default from email address for Resend
+RESEND_FROM_EMAIL=noreply@sarsalab.xyz
+
 NODE_ENV=development
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ENVEOF
 
 echo -e "${GREEN}✓ .env.local file created successfully!${NC}"
-echo -e "${YELLOW}Note: Please update Google OAuth credentials manually${NC}"
+echo -e "${YELLOW}Note: Please update Google OAuth credentials and Resend API key manually${NC}"
 
 chmod 600 .env.local
 

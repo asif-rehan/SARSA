@@ -1,5 +1,6 @@
 import Link from "next/link";
 import GoogleLoginButton from "@/components/GoogleLoginButton";
+import EmailPasswordForm from "@/components/EmailPasswordForm";
 
 export default function SignInPage() {
   return (
@@ -14,7 +15,7 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <GoogleLoginButton />
           
           <div className="relative">
@@ -23,8 +24,16 @@ export default function SignInPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-zinc-50 px-2 text-zinc-500 dark:bg-black dark:text-zinc-500">
-                or
+                or continue with email
               </span>
+            </div>
+          </div>
+
+          <EmailPasswordForm />
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-zinc-300 dark:border-zinc-700" />
             </div>
           </div>
 

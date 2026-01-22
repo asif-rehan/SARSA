@@ -21,6 +21,7 @@ export default defineConfig({
       STRIPE_SECRET_KEY: 'sk_test_placeholder_key',
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'pk_test_placeholder_key',
       STRIPE_WEBHOOK_SECRET: 'whsec_test_placeholder_secret',
+      RESEND_FROM_EMAIL: 'noreply@sarsalab.xyz',
     },
   },
   resolve: {

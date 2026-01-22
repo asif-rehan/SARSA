@@ -13,6 +13,11 @@
 - PostgreSQL 16 (Docker containerized)
 - Kysely 0.28.10 as query builder
 
+**Email Service:**
+- Resend for email delivery and verification
+- Better-Auth Resend plugin for seamless integration
+- Email verification and password reset flows
+
 **Payment Processing:**
 - Stripe integration (@stripe/stripe-js, @stripe/react-stripe-js)
 - Stripe webhooks for subscription management
@@ -80,6 +85,7 @@ npm run db:migrate   # Run Better-Auth migrations
 npm test -- --run    # Run unit/integration tests (non-interactive)
 npm run test:ui      # Run tests with Vitest UI (interactive - avoid in automation)
 npm run test:e2e     # Run Playwright e2e tests (headless by default)
+npm run test:e2e:agent  # Run e2e tests in agent mode (non-interactive, list reporter)
 npm run test:e2e:ui  # Run e2e tests with UI (interactive - avoid in automation)
 ```
 
@@ -88,11 +94,18 @@ npm run test:e2e:ui  # Run e2e tests with UI (interactive - avoid in automation)
 # Run all tests non-interactively
 npm test -- --run                    # Unit/integration tests
 npm run test:e2e                     # E2E tests headless (default)
+npm run test:e2e:agent               # E2E tests with agent-friendly reporter
 npm run test:e2e -- --project=chromium  # E2E tests specific browser
 
 # Combined test execution for full validation
-npm test -- --run && npm run test:e2e
+npm test -- --run && npm run test:e2e:agent
 ```
+
+**CRITICAL E2E Testing Rules for Agents:**
+- **NEVER use interactive HTML reports**: Avoid commands that start servers requiring manual termination
+- **Always exit cleanly**: E2E tests must complete and exit without user intervention
+- **Use headless mode**: All E2E tests run in headless browsers by default
+- **No manual quit required**: Tests should never require Ctrl+C or manual termination
 
 **Full Setup Command:**
 ```bash
@@ -116,6 +129,7 @@ npm run setup        # Runs: setup-env + db:start + db:migrate
 - Auth: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
 - OAuth: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 - Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+- Email: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`
 
 ## Development Workflow
 

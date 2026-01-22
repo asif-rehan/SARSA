@@ -253,9 +253,14 @@ export default function ProfileClient({ user: initialUser }: ProfileClientProps)
                   </Badge>
                 </div>
                 {!user.emailVerified && (
-                  <Button variant="outline" size="sm">
-                    Send Verification Email
-                  </Button>
+                  <div className="space-y-2">
+                    <Button variant="outline" size="sm">
+                      Send Verification Email
+                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      Please verify your email to access all features
+                    </p>
+                  </div>
                 )}
                 
                 <Separator />

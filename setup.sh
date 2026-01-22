@@ -100,6 +100,8 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 NODE_ENV=development
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+RESEND_API_KEY=your_resend_api_key
 ENVEOF
 
 echo -e "${GREEN}✓ .env.local file created successfully!${NC}"
