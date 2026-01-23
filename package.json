@@ -16,7 +16,8 @@
     "db:stop": "docker-compose down",
     "db:migrate": "npx dotenv-cli -e .env.local -- npx @better-auth/cli migrate --yes",
     "db:reset": "./scripts/reset-db.sh",
-    "setup": "./scripts/setup-env.sh && npm run db:start && npm run db:migrate"
+    "setup": "./scripts/setup-env.sh && npm run db:start && npm run db:migrate",
+    "stripe:setup": "node scripts/setup-stripe-prices.js"
   },
   "dependencies": {
     "@better-auth/oauth-provider": "^1.4.17",

@@ -41,14 +41,14 @@ const plans: SubscriptionPlan[] = [
     id: 'basic',
     name: 'Basic Plan',
     price: 9,
-    priceId: 'price_1QdGHDB4dU1calXYtest_basic',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID || 'price_basic_placeholder',
     features: ['Basic features', 'Email support', '1 user', '5 projects'],
   },
   {
     id: 'pro',
     name: 'Pro Plan',
     price: 29,
-    priceId: 'price_1QdGHDB4dU1calXYtest_pro',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_pro_placeholder',
     features: ['All basic features', 'Priority support', '5 users', '20 projects', 'Advanced analytics'],
     popular: true,
   },
@@ -56,7 +56,7 @@ const plans: SubscriptionPlan[] = [
     id: 'enterprise',
     name: 'Enterprise Plan',
     price: 99,
-    priceId: 'price_1QdGHDB4dU1calXYtest_enterprise',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise_placeholder',
     features: ['All pro features', '24/7 support', 'Unlimited users', '100 projects', 'Custom integrations'],
   },
 ];
@@ -67,6 +67,9 @@ export function SubscriptionPlans() {
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+
+  // Check if Stripe is properly configured
+  const isStripeConfigured = !plans.some(plan => plan.priceId.includes('placeholder'));
 
   useEffect(() => {
     loadSession();
@@ -118,6 +121,12 @@ export function SubscriptionPlans() {
     // Check if email is verified
     if (!session.user.emailVerified) {
       setError('Please verify your email address before subscribing. Check your inbox for the verification link.');
+      return;
+    }
+
+    // Check if price ID is a placeholder
+    if (plan.priceId.includes('placeholder')) {
+      setError('Stripe is not configured yet. Please run "npm run stripe:setup" to configure your Stripe products and prices.');
       return;
     }
 
@@ -183,6 +192,32 @@ export function SubscriptionPlans() {
           onClearError={() => setError('')}
           onClearSuccess={() => setSuccess('')}
         />
+
+        {/* Development Notice for Stripe Configuration */}
+        {!isStripeConfigured && process.env.NODE_ENV === 'development' && (
+          <FadeIn delay={0.1}>
+            <Card className="mb-6 sm:mb-8 max-w-4xl mx-auto border-orange-500/50 bg-orange-500/5">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                  ⚠️ Stripe Configuration Required
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  Stripe products and prices need to be set up for the subscription system to work.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-sm text-muted-foreground">
+                  <p className="mb-2">To set up Stripe for this application:</p>
+                  <ol className="list-decimal list-inside space-y-1 ml-4">
+                    <li>Make sure your STRIPE_SECRET_KEY is set in .env.local</li>
+                    <li>Run: <code className="bg-muted px-2 py-1 rounded text-xs">npm run stripe:setup</code></li>
+                    <li>Restart your development server</li>
+                  </ol>
+                </div>
+              </CardContent>
+            </Card>
+          </FadeIn>
+        )}
 
       {/* Authentication Status - Mobile optimized */}
       {!session?.user ? (
