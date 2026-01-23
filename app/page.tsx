@@ -9,7 +9,7 @@ import {
   Check, Star, ArrowRight, Clock, TrendingUp, Users, Zap as ZapIcon,
   Github, Twitter, Linkedin, Mail
 } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import Navigation from "@/components/Navigation";
 import { useState } from "react";
 
 export default function Home() {
@@ -24,22 +24,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
-      {/* ===== SECTION 1: HERO - Get Email or Get Scroll ===== */}
-      <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-primary to-primary/80 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold truncate">SaaS Template</h2>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      {/* ===== NAVIGATION ===== */}
+      <Navigation currentPath="/" />
 
-      {/* HERO SECTION */}
+      {/* ===== SECTION 1: HERO - Get Email or Get Scroll ===== */}
       <section className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
