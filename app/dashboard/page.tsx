@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { User, CreditCard, Settings } from 'lucide-react';
+import { PaymentHistory } from '@/components/PaymentHistory';
 
 interface UserSession {
   user: {
@@ -108,7 +109,7 @@ export default function Dashboard() {
       
       <main className="container mx-auto px-4 py-6 sm:py-8">
         {/* Mobile-optimized dashboard cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
           <Card className="h-full hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push('/profile')}>
             <CardHeader className="pb-4">
               <div className="flex items-center space-x-3">
@@ -157,6 +158,9 @@ export default function Dashboard() {
             </CardHeader>
           </Card>
         </div>
+
+        {/* Payment History Section */}
+        <PaymentHistory />
       </main>
     </div>
   );

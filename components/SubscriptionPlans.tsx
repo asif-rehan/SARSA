@@ -14,6 +14,7 @@ import { FadeIn } from '@/components/transitions/fade-in';
 import { StaggerContainer, StaggerItem } from '@/components/interactions/stagger-container';
 import { FormStatus } from '@/components/forms/form-status';
 import { CurrentSubscriptionSection, UserSubscription } from './CurrentSubscriptionSection';
+import { PaymentHistory } from './PaymentHistory';
 
 interface SubscriptionPlan {
   id: string;
@@ -318,15 +319,18 @@ export function SubscriptionPlans() {
 
 
 
-      {/* Billing History Section */}
+      {/* Payment History Section */}
       {session?.user && (
-        <BillingHistory />
+        <PaymentHistory className="max-w-4xl mx-auto mb-8" />
       )}
 
       {/* Payment Form Section */}
       {processingPlan && (
-        <PaymentForm 
+        <StripePaymentForm 
           planId={processingPlan}
+          planName={plans.find(p => p.id === processingPlan)?.name || ''}
+          price={plans.find(p => p.id === processingPlan)?.price || 0}
+          priceId={plans.find(p => p.id === processingPlan)?.priceId || ''}
           onCancel={() => setProcessingPlan(null)}
           onSuccess={() => {
             setProcessingPlan(null);
@@ -361,202 +365,6 @@ export function SubscriptionPlans() {
           role="textbox"
         />
       </div>
-      </div>
-    </div>
-  );
-}
-
-// Billing History Component
-function BillingHistory() {
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadBillingHistory();
-  }, []);
-
-  const loadBillingHistory = async () => {
-    try {
-      const response = await fetch('/api/billing-history');
-      if (response.ok) {
-        const data = await response.json();
-        setInvoices(data.invoices || []);
-      }
-    } catch (error) {
-      console.error('Failed to load billing history:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle>Billing History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse bg-muted h-20 rounded"></div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>Recent Invoices</CardTitle>
-        <CardDescription>Your billing history and invoices</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {invoices.length === 0 ? (
-          <p className="text-muted-foreground">No billing history available.</p>
-        ) : (
-          <div className="space-y-4">
-            {invoices.map((invoice) => (
-              <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <p className="font-medium">Pro Plan - Monthly</p>
-                  <p className="text-sm text-muted-foreground">{new Date(invoice.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">${invoice.amount.toFixed(2)}</p>
-                  <Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'} className={invoice.status === 'paid' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800' : ''}>
-                    {invoice.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// Payment Form Component
-interface PaymentFormProps {
-  planId: string;
-  onCancel: () => void;
-  onSuccess: () => void;
-  onError: (error: string) => void;
-}
-
-function PaymentForm({ planId, onCancel, onSuccess, onError }: PaymentFormProps) {
-  const [processing, setProcessing] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setProcessing(true);
-    setValidationErrors([]);
-
-    const formData = new FormData(e.target as HTMLFormElement);
-    const cardNumber = formData.get('cardNumber') as string;
-    const expiry = formData.get('expiry') as string;
-    const cvv = formData.get('cvv') as string;
-
-    // Mock validation
-    const errors: string[] = [];
-    if (!cardNumber) errors.push('Card number is required');
-    if (!expiry) errors.push('Expiry date is required');
-    if (!cvv) errors.push('CVV is required');
-
-    if (errors.length > 0) {
-      setValidationErrors(errors);
-      setProcessing(false);
-      return;
-    }
-
-    try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock payment failure for testing - trigger error for 'pro' plan
-      if (planId === 'pro') {
-        throw new Error('Payment failed');
-      }
-      
-      onSuccess();
-    } catch (error: any) {
-      onError('Payment failed. Please try again.');
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background border rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-lg">
-        <h3 className="text-lg sm:text-xl font-semibold mb-4 text-foreground">Enter Payment Details</h3>
-        
-        {validationErrors.length > 0 && (
-          <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded mb-4">
-            {validationErrors.map((error, index) => (
-              <div key={index}>{error}</div>
-            ))}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="cardNumber" className="block text-sm font-medium text-foreground mb-1">
-              Card Number
-            </label>
-            <input
-              type="text"
-              id="cardNumber"
-              name="cardNumber"
-              className="w-full border border-input bg-background text-foreground rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-ring focus:border-ring placeholder:text-muted-foreground"
-              placeholder="1234 5678 9012 3456"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="expiry" className="block text-sm font-medium text-foreground mb-1">
-                Expiry Date
-              </label>
-              <input
-                type="text"
-                id="expiry"
-                name="expiry"
-                className="w-full border border-input bg-background text-foreground rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-ring focus:border-ring placeholder:text-muted-foreground"
-                placeholder="MM/YY"
-              />
-            </div>
-            <div>
-              <label htmlFor="cvv" className="block text-sm font-medium text-foreground mb-1">
-                CVV
-              </label>
-              <input
-                type="text"
-                id="cvv"
-                name="cvv"
-                className="w-full border border-input bg-background text-foreground rounded-md px-3 py-3 text-base focus:ring-2 focus:ring-ring focus:border-ring placeholder:text-muted-foreground"
-                placeholder="123"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 py-3 px-4 border border-input bg-background text-foreground rounded-md hover:bg-accent hover:text-accent-foreground font-medium min-h-[48px] transition-colors"
-              disabled={processing}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={processing}
-              className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 font-medium min-h-[48px] transition-colors"
-            >
-              {processing ? 'Processing...' : 'Complete Subscription'}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
