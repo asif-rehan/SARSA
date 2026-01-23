@@ -65,7 +65,7 @@ describe('Property 6: Human-Readable Formatting', () => {
     it('should format dates in user-friendly format for any valid date input', () => {
       fc.assert(
         fc.property(
-          fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }),
+          fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).filter(d => !isNaN(d.getTime())),
           (date) => {
             const dateString = date.toISOString();
             
@@ -271,7 +271,7 @@ describe('Property 6: Human-Readable Formatting', () => {
             planName: fc.constantFrom('basic', 'pro', 'enterprise'),
             price: fc.float({ min: 0, max: Math.fround(199.99), noNaN: true }),
             status: fc.constantFrom('active', 'trialing', 'canceled') as fc.Arbitrary<SubscriptionStatus>,
-            nextBillingDate: fc.date({ min: new Date('2024-01-01'), max: new Date('2025-12-31') }).map(d => d.toISOString()),
+            nextBillingDate: fc.date({ min: new Date('2024-01-01'), max: new Date('2025-12-31') }).filter(d => !isNaN(d.getTime())).map(d => d.toISOString()),
           }),
           (subscriptionData) => {
             const { container } = render(
