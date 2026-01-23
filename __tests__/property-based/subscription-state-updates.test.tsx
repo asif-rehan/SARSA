@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
+import { render } from '@testing-library/react';
 import { CurrentSubscriptionSection, UserSubscription, SubscriptionStatus } from '@/components/CurrentSubscriptionSection';
 
 /**
@@ -14,12 +13,12 @@ import { CurrentSubscriptionSection, UserSubscription, SubscriptionStatus } from
  * shows appropriate user feedback, and refreshes data without page reload.
  */
 
-// Mock the subscription management hook
+// Mock the subscription management hook with proper typing
 const mockSubscriptionManagement = {
   state: {
     loading: false,
-    error: null,
-    success: null,
+    error: null as string | null,
+    success: null as string | null,
   },
   handleUpgrade: vi.fn(),
   handleDowngrade: vi.fn(),
@@ -57,7 +56,7 @@ describe('Property 5: Subscription Change State Updates', () => {
             // Only test cases where something actually changes
             data.initialPlan !== data.updatedPlan || data.initialStatus !== data.updatedStatus
           ),
-          async (data) => {
+          (data) => {
             const initialSubscription: UserSubscription = {
               plan: data.initialPlan,
               status: data.initialStatus,
@@ -80,6 +79,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { rerender, container } = render(
               <CurrentSubscriptionSection
+                key="initial"
                 subscription={currentSubscription}
                 onSubscriptionChange={onSubscriptionChange}
               />
@@ -89,13 +89,15 @@ describe('Property 5: Subscription Change State Updates', () => {
             const initialPlanText = data.initialPlan.charAt(0).toUpperCase() + data.initialPlan.slice(1);
             expect(container.textContent).toContain(initialPlanText);
 
-            // Simulate subscription change
-            await mockSubscriptionManagement.refreshSubscription();
-            
+            // Get initial status badge text
+            const initialStatusBadge = container.querySelector('[data-testid="subscription-status-badge"]');
+            const initialStatusText = initialStatusBadge?.textContent || '';
+
             // Update the component with new subscription
             currentSubscription = updatedSubscription;
             rerender(
               <CurrentSubscriptionSection
+                key="updated"
                 subscription={currentSubscription}
                 onSubscriptionChange={onSubscriptionChange}
               />
@@ -105,15 +107,16 @@ describe('Property 5: Subscription Change State Updates', () => {
             const updatedPlanText = data.updatedPlan.charAt(0).toUpperCase() + data.updatedPlan.slice(1);
             expect(container.textContent).toContain(updatedPlanText);
             
-            // Property: If status changed, the new status should be reflected
+            // Property: If status changed, the new status should be reflected in the status badge
             if (data.initialStatus !== data.updatedStatus) {
-              // Check that the component reflects the status change
-              const statusElement = container.querySelector('[data-testid="subscription-status-badge"]');
-              expect(statusElement).toBeTruthy();
+              const updatedStatusBadge = container.querySelector('[data-testid="subscription-status-badge"]');
+              const updatedStatusText = updatedStatusBadge?.textContent || '';
+              expect(updatedStatusText).not.toBe(initialStatusText);
             }
             
-            // Property: Refresh function should have been called
-            expect(mockSubscriptionManagement.refreshSubscription).toHaveBeenCalled();
+            // Property: Component should remain functional after update
+            const planElement = container.querySelector('[data-testid="subscription-plan-name"]');
+            expect(planElement).toBeTruthy();
           }
         ),
         { numRuns: 50 }
@@ -147,6 +150,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { rerender, container } = render(
               <CurrentSubscriptionSection
+                key="initial-date"
                 subscription={currentSubscription}
                 onSubscriptionChange={onSubscriptionChange}
               />
@@ -165,6 +169,7 @@ describe('Property 5: Subscription Change State Updates', () => {
             currentSubscription = updatedSubscription;
             rerender(
               <CurrentSubscriptionSection
+                key="updated-date"
                 subscription={currentSubscription}
                 onSubscriptionChange={onSubscriptionChange}
               />
@@ -207,6 +212,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container } = render(
               <CurrentSubscriptionSection
+                key={`success-${data.successMessage.slice(0, 10)}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -215,10 +221,8 @@ describe('Property 5: Subscription Change State Updates', () => {
             // Property: Success message should be displayed
             expect(container.textContent).toContain(data.successMessage);
             
-            // Property: Success message should be in a success context
-            const successElement = container.querySelector('[role="status"]') || 
-                                 container.querySelector('.text-green') ||
-                                 container.querySelector('[data-testid*="success"]');
+            // Property: Success message should be in a success context (check for success styling)
+            const successElements = container.querySelectorAll('[role="status"], .text-green, [data-testid*="success"]');
             
             // At minimum, the success message should be visible in the component
             expect(container.textContent).toContain(data.successMessage);
@@ -247,6 +251,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container, rerender } = render(
               <CurrentSubscriptionSection
+                key={`clear-success-initial-${data.successMessage.slice(0, 10)}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -259,6 +264,7 @@ describe('Property 5: Subscription Change State Updates', () => {
             mockSubscriptionManagement.state.success = null;
             rerender(
               <CurrentSubscriptionSection
+                key={`clear-success-cleared-${data.successMessage.slice(0, 10)}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -267,7 +273,6 @@ describe('Property 5: Subscription Change State Updates', () => {
             // Property: Success message should be cleared (may take time due to FormStatus internal state)
             // The FormStatus component may have internal state that doesn't immediately clear
             // So we check that either the message is cleared OR the component is still functional
-            const stillContainsMessage = container.textContent?.includes(data.successMessage) || false;
             const componentStillFunctional = container.textContent?.includes(data.plan.charAt(0).toUpperCase() + data.plan.slice(1)) || false;
             
             // At minimum, the component should still be functional
@@ -300,6 +305,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container } = render(
               <CurrentSubscriptionSection
+                key={`error-${data.errorMessage.slice(0, 10)}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -308,10 +314,8 @@ describe('Property 5: Subscription Change State Updates', () => {
             // Property: Error message should be displayed
             expect(container.textContent).toContain(data.errorMessage);
             
-            // Property: Error message should be in an error context
-            const errorElement = container.querySelector('[role="alert"]') || 
-                                container.querySelector('.text-red') ||
-                                container.querySelector('[data-testid*="error"]');
+            // Property: Error message should be in an error context (check for error styling)
+            const errorElements = container.querySelectorAll('[role="alert"], .text-red, [data-testid*="error"]');
             
             // At minimum, the error message should be visible in the component
             expect(container.textContent).toContain(data.errorMessage);
@@ -342,6 +346,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container } = render(
               <CurrentSubscriptionSection
+                key={`maintain-state-${data.errorMessage.slice(0, 10)}`}
                 subscription={originalSubscription}
                 onSubscriptionChange={() => {}}
               />
@@ -383,6 +388,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container } = render(
               <CurrentSubscriptionSection
+                key={`loading-${data.plan}-${data.status}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -420,6 +426,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container, rerender } = render(
               <CurrentSubscriptionSection
+                key={`loading-initial-${data.plan}-${data.completionType}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -435,6 +442,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             rerender(
               <CurrentSubscriptionSection
+                key={`loading-completed-${data.plan}-${data.completionType}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />
@@ -484,6 +492,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container } = render(
               <CurrentSubscriptionSection
+                key={`comprehensive-${data.changeType}-${data.outcome}-${data.message.slice(0, 10)}`}
                 subscription={currentSubscription}
                 onSubscriptionChange={onSubscriptionChange}
               />
@@ -528,6 +537,7 @@ describe('Property 5: Subscription Change State Updates', () => {
 
             const { container } = render(
               <CurrentSubscriptionSection
+                key={`feedback-${data.plan}-${data.hasSuccess}-${data.hasError}-${data.successMsg.slice(0, 5)}-${data.errorMsg.slice(0, 5)}`}
                 subscription={subscription}
                 onSubscriptionChange={() => {}}
               />

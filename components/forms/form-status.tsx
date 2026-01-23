@@ -55,6 +55,7 @@ export function FormStatus({
       <AnimatePresence>
         {showError && error && (
           <motion.div
+            key={`error-${error}`}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -70,6 +71,7 @@ export function FormStatus({
         
         {showSuccess && success && (
           <motion.div
+            key={`success-${success}`}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
