@@ -9,9 +9,10 @@ import { AnimatedButton } from './interactions/animated-button';
 interface GoogleLoginButtonProps {
   isLoading?: boolean;
   disabled?: boolean;
+  redirect?: string;
 }
 
-export default function GoogleLoginButton({ isLoading = false, disabled = false }: GoogleLoginButtonProps) {
+export default function GoogleLoginButton({ isLoading = false, disabled = false, redirect }: GoogleLoginButtonProps) {
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -21,7 +22,7 @@ export default function GoogleLoginButton({ isLoading = false, disabled = false 
       setIsAuthenticating(true);
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard',
+        callbackURL: redirect || '/dashboard',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');

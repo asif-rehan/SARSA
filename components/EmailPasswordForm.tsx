@@ -8,9 +8,10 @@ import { Label } from '@/components/ui/label';
 
 interface EmailPasswordFormProps {
   mode?: 'signin' | 'signup';
+  redirect?: string;
 }
 
-export default function EmailPasswordForm({ mode = 'signin' }: EmailPasswordFormProps) {
+export default function EmailPasswordForm({ mode = 'signin', redirect }: EmailPasswordFormProps) {
   const [isSignUp, setIsSignUp] = useState(mode === 'signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,7 +48,8 @@ export default function EmailPasswordForm({ mode = 'signin' }: EmailPasswordForm
         if (result.error) {
           setMessage(`Error: ${result.error.message}`);
         } else {
-          window.location.href = '/dashboard';
+          // Redirect to specified URL or default to dashboard
+          window.location.href = redirect || '/dashboard';
         }
       }
     } catch (error) {

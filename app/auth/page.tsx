@@ -1,15 +1,17 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import GoogleLoginButton from "@/components/GoogleLoginButton";
 import EmailPasswordForm from "@/components/EmailPasswordForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 interface AuthPageProps {
-  searchParams: { mode?: 'signin' | 'signup' };
+  searchParams: { mode?: 'signin' | 'signup'; redirect?: string };
 }
 
 export default function AuthPage({ searchParams }: AuthPageProps) {
   const mode = searchParams.mode || 'signin';
+  const redirectParam = searchParams.redirect;
   const isSignUp = mode === 'signup';
 
   return (
@@ -43,7 +45,7 @@ export default function AuthPage({ searchParams }: AuthPageProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Social Login */}
-              <GoogleLoginButton />
+              <GoogleLoginButton redirect={redirectParam} />
               
               {/* Divider */}
               <div className="relative">
@@ -58,7 +60,7 @@ export default function AuthPage({ searchParams }: AuthPageProps) {
               </div>
 
               {/* Email/Password Form */}
-              <EmailPasswordForm mode={mode} />
+              <EmailPasswordForm mode={mode} redirect={redirectParam} />
 
               {/* Toggle between sign in/up */}
               <div className="text-center text-sm">
@@ -66,7 +68,7 @@ export default function AuthPage({ searchParams }: AuthPageProps) {
                   {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
                 </span>
                 <Link 
-                  href={`/auth?mode=${isSignUp ? 'signin' : 'signup'}`} 
+                  href={`/auth?mode=${isSignUp ? 'signin' : 'signup'}${redirectParam ? `&redirect=${encodeURIComponent(redirectParam)}` : ''}`} 
                   className="text-primary hover:underline font-medium"
                 >
                   {isSignUp ? 'Sign In' : 'Sign Up'}

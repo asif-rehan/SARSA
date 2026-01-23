@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import { StaggerContainer, StaggerItem } from '@/components/interactions/stagger
 import { FormStatus } from '@/components/forms/form-status';
 import { CurrentSubscriptionSection, UserSubscription } from './CurrentSubscriptionSection';
 import { PaymentHistory } from './PaymentHistory';
+import { StripePaymentForm } from './StripePaymentForm';
 
 interface SubscriptionPlan {
   id: string;
@@ -109,7 +110,7 @@ export function SubscriptionPlans() {
 
   const handlePlanSelect = async (plan: SubscriptionPlan) => {
     if (!session?.user) {
-      // Redirect to sign up if not authenticated
+      // Redirect to sign up if not authenticated - using the format expected by integration tests
       window.location.href = '/auth/signup?redirect=/subscription';
       return;
     }
@@ -128,18 +129,6 @@ export function SubscriptionPlans() {
     // In production, this would redirect to Stripe Checkout
     // For now, we'll show the payment form modal
   };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      timeZone: 'UTC', // Use UTC to avoid timezone issues
-    });
-  };
-
-
 
   const getButtonText = (plan: SubscriptionPlan) => {
     if (!session?.user) return 'Sign In to Subscribe';
@@ -337,7 +326,7 @@ export function SubscriptionPlans() {
             setSuccess('Subscription created successfully!');
             loadSession(); // Reload session to get updated subscription
           }}
-          onError={(error) => {
+          onError={(error: string) => {
             setProcessingPlan(null);
             setError(error);
           }}

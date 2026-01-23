@@ -1,5 +1,14 @@
 import { redirect } from 'next/navigation';
 
-export default function SignInPage() {
-  redirect('/auth?mode=signin');
+interface SignInPageProps {
+  searchParams: { redirect?: string };
+}
+
+export default function SignInPage({ searchParams }: SignInPageProps) {
+  const redirectParam = searchParams.redirect;
+  const targetUrl = redirectParam 
+    ? `/auth?mode=signin&redirect=${encodeURIComponent(redirectParam)}`
+    : '/auth?mode=signin';
+  
+  redirect(targetUrl);
 }

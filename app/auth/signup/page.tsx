@@ -1,5 +1,14 @@
 import { redirect } from 'next/navigation';
 
-export default function SignUpPage() {
-  redirect('/auth?mode=signup');
+interface SignUpPageProps {
+  searchParams: { redirect?: string };
+}
+
+export default function SignUpPage({ searchParams }: SignUpPageProps) {
+  const redirectParam = searchParams.redirect;
+  const targetUrl = redirectParam 
+    ? `/auth?mode=signup&redirect=${encodeURIComponent(redirectParam)}`
+    : '/auth?mode=signup';
+  
+  redirect(targetUrl);
 }
