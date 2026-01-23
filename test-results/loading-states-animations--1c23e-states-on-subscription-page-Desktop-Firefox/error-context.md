@@ -1,0 +1,366 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e5]:
+      - link "SaaS Template" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e8]
+        - generic [ref=e10]: SaaS Template
+      - navigation [ref=e11]:
+        - link "Features" [ref=e12] [cursor=pointer]:
+          - /url: "#features"
+        - link "Pricing" [ref=e13] [cursor=pointer]:
+          - /url: /subscription
+        - link "Docs" [ref=e14] [cursor=pointer]:
+          - /url: "#docs"
+      - generic [ref=e15]:
+        - link "Sign In" [ref=e16] [cursor=pointer]:
+          - /url: /auth/signin
+          - button "Sign In" [ref=e17]
+        - link "Sign Up" [ref=e18] [cursor=pointer]:
+          - /url: /auth/signup
+          - button "Sign Up" [ref=e19]
+        - button "Toggle theme" [ref=e20]:
+          - img [ref=e21]
+          - generic [ref=e31]: Toggle theme
+    - generic [ref=e34]:
+      - generic [ref=e36]: 🚀 Production-Ready Template
+      - heading "Ship Your SaaS in Days, Not Months" [level=1] [ref=e37]
+      - paragraph [ref=e38]: Production-ready SaaS boilerplate with authentication, payments, and analytics. Save 3+ months of development time.
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - textbox "your@email.com" [ref=e41]
+          - button "Get Started" [ref=e42]
+        - link "Sign Up" [ref=e43] [cursor=pointer]:
+          - /url: /auth/signup
+          - button "Sign Up" [ref=e44]
+      - generic [ref=e45]:
+        - generic [ref=e53]: 500+ developers building
+        - generic [ref=e54]:
+          - img [ref=e55]
+          - generic [ref=e57]: 4.9/5 satisfaction
+    - generic [ref=e59]:
+      - generic [ref=e60]:
+        - heading "Join Developers Who've Already Shipped" [level=2] [ref=e61]
+        - paragraph [ref=e62]: See real results from developers using this template
+      - generic [ref=e63]:
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - img [ref=e67]
+            - img [ref=e69]
+            - img [ref=e71]
+            - img [ref=e73]
+            - img [ref=e75]
+          - paragraph [ref=e77]: "\"Launched my SaaS in 2 weeks instead of 3 months. This template is a game-changer.\""
+          - generic [ref=e79]: AC
+          - generic [ref=e80]: Alex Chen
+          - generic [ref=e81]: Indie Hacker
+          - generic [ref=e82]: 2 weeks to launch
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - img [ref=e86]
+            - img [ref=e88]
+            - img [ref=e90]
+            - img [ref=e92]
+            - img [ref=e94]
+          - paragraph [ref=e96]: "\"The built-in auth and payments saved us thousands in development costs.\""
+          - generic [ref=e98]: SJ
+          - generic [ref=e99]: Sarah Johnson
+          - generic [ref=e100]: Startup Founder
+          - generic [ref=e101]: $50k saved
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - img [ref=e105]
+            - img [ref=e107]
+            - img [ref=e109]
+            - img [ref=e111]
+            - img [ref=e113]
+          - paragraph [ref=e115]: "\"Best TypeScript boilerplate I've used. Production-ready out of the box.\""
+          - generic [ref=e117]: MR
+          - generic [ref=e118]: Mike Rodriguez
+          - generic [ref=e119]: Full Stack Dev
+          - generic [ref=e120]: 100% test coverage
+    - generic [ref=e123]:
+      - heading "The Problem With Building SaaS From Scratch" [level=2] [ref=e124]
+      - generic [ref=e125]:
+        - generic [ref=e127]:
+          - img [ref=e129]
+          - generic [ref=e132]:
+            - heading "3+ Months Development" [level=3] [ref=e133]
+            - paragraph [ref=e134]: Your competitors launch while you're still building auth
+        - generic [ref=e136]:
+          - img [ref=e138]
+          - generic [ref=e140]:
+            - heading "Security Vulnerabilities" [level=3] [ref=e141]
+            - paragraph [ref=e142]: One mistake costs you customer trust and compliance fines
+        - generic [ref=e144]:
+          - img [ref=e146]
+          - generic [ref=e149]:
+            - heading "$50k+ in Dev Costs" [level=3] [ref=e150]
+            - paragraph [ref=e151]: Hiring developers to build what's already solved
+        - generic [ref=e153]:
+          - img [ref=e155]
+          - generic [ref=e157]:
+            - heading "Maintenance Nightmare" [level=3] [ref=e158]
+            - paragraph [ref=e159]: Constant bug fixes and security patches drain your team
+    - generic [ref=e162]:
+      - heading "Everything You Need to Launch" [level=2] [ref=e163]
+      - paragraph [ref=e164]: Production-ready features that would take months to build
+      - generic [ref=e165]:
+        - generic [ref=e166]:
+          - heading "Authentication" [level=3] [ref=e168]
+          - list [ref=e170]:
+            - listitem [ref=e171]:
+              - img [ref=e172]
+              - text: Google OAuth
+            - listitem [ref=e174]:
+              - img [ref=e175]
+              - text: Email/Password
+            - listitem [ref=e177]:
+              - img [ref=e178]
+              - text: Session Management
+            - listitem [ref=e180]:
+              - img [ref=e181]
+              - text: Role-Based Access
+        - generic [ref=e183]:
+          - heading "Payments" [level=3] [ref=e185]
+          - list [ref=e187]:
+            - listitem [ref=e188]:
+              - img [ref=e189]
+              - text: Stripe Integration
+            - listitem [ref=e191]:
+              - img [ref=e192]
+              - text: Subscription Management
+            - listitem [ref=e194]:
+              - img [ref=e195]
+              - text: Invoice Generation
+            - listitem [ref=e197]:
+              - img [ref=e198]
+              - text: Webhook Handling
+        - generic [ref=e200]:
+          - heading "Database" [level=3] [ref=e202]
+          - list [ref=e204]:
+            - listitem [ref=e205]:
+              - img [ref=e206]
+              - text: PostgreSQL Setup
+            - listitem [ref=e208]:
+              - img [ref=e209]
+              - text: Kysely Query Builder
+            - listitem [ref=e211]:
+              - img [ref=e212]
+              - text: Migrations
+            - listitem [ref=e214]:
+              - img [ref=e215]
+              - text: Connection Pooling
+        - generic [ref=e217]:
+          - heading "Developer Experience" [level=3] [ref=e219]
+          - list [ref=e221]:
+            - listitem [ref=e222]:
+              - img [ref=e223]
+              - text: 100% TypeScript
+            - listitem [ref=e225]:
+              - img [ref=e226]
+              - text: Comprehensive Tests
+            - listitem [ref=e228]:
+              - img [ref=e229]
+              - text: CI/CD Ready
+            - listitem [ref=e231]:
+              - img [ref=e232]
+              - text: Full Documentation
+        - generic [ref=e234]:
+          - heading "Security" [level=3] [ref=e236]
+          - list [ref=e238]:
+            - listitem [ref=e239]:
+              - img [ref=e240]
+              - text: CSRF Protection
+            - listitem [ref=e242]:
+              - img [ref=e243]
+              - text: Input Validation
+            - listitem [ref=e245]:
+              - img [ref=e246]
+              - text: Secure Headers
+            - listitem [ref=e248]:
+              - img [ref=e249]
+              - text: Best Practices
+        - generic [ref=e251]:
+          - heading "Performance" [level=3] [ref=e253]
+          - list [ref=e255]:
+            - listitem [ref=e256]:
+              - img [ref=e257]
+              - text: Sub-2s Load Times
+            - listitem [ref=e259]:
+              - img [ref=e260]
+              - text: Lighthouse 95+
+            - listitem [ref=e262]:
+              - img [ref=e263]
+              - text: Optimized Images
+            - listitem [ref=e265]:
+              - img [ref=e266]
+              - text: Caching Strategy
+      - generic [ref=e269]:
+        - generic [ref=e270]:
+          - generic [ref=e271]: 3+
+          - generic [ref=e272]: Months Saved
+        - generic [ref=e273]:
+          - generic [ref=e274]: $50k
+          - generic [ref=e275]: Dev Costs
+        - generic [ref=e276]:
+          - generic [ref=e277]: 50k+
+          - generic [ref=e278]: Lines of Code
+        - generic [ref=e279]:
+          - generic [ref=e280]: 100%
+          - generic [ref=e281]: Test Coverage
+    - generic [ref=e283]:
+      - generic [ref=e284]:
+        - heading "Trusted by Developers Worldwide" [level=2] [ref=e285]
+        - paragraph [ref=e286]: Join a growing community of builders
+      - generic [ref=e287]:
+        - generic [ref=e288]:
+          - img [ref=e289]
+          - generic [ref=e292]: 5.2k
+          - generic [ref=e293]: GitHub Stars
+        - generic [ref=e294]:
+          - img [ref=e295]
+          - generic [ref=e298]: 500+
+          - generic [ref=e299]: Active Projects
+        - generic [ref=e300]:
+          - img [ref=e301]
+          - generic [ref=e306]: 10k+
+          - generic [ref=e307]: Developers
+        - generic [ref=e308]:
+          - img [ref=e309]
+          - generic [ref=e311]: 99.9%
+          - generic [ref=e312]: Uptime
+      - generic [ref=e313]:
+        - paragraph [ref=e314]: Featured in
+        - generic [ref=e315]:
+          - generic [ref=e316]: Product Hunt
+          - generic [ref=e317]: Hacker News
+          - generic [ref=e318]: GitHub Trending
+          - generic [ref=e319]: Dev.to
+    - generic [ref=e322]:
+      - heading "From Idea to Launch in Days" [level=2] [ref=e323]
+      - generic [ref=e324]:
+        - generic [ref=e325]:
+          - generic [ref=e327]: "1"
+          - generic [ref=e328]:
+            - heading "Clone & Setup" [level=3] [ref=e329]
+            - paragraph [ref=e330]: Run one command and get a fully configured SaaS template
+            - generic [ref=e331]: 5 minutes
+        - generic [ref=e332]:
+          - generic [ref=e334]: "2"
+          - generic [ref=e335]:
+            - heading "Customize" [level=3] [ref=e336]
+            - paragraph [ref=e337]: Update branding, features, and business logic for your product
+            - generic [ref=e338]: 1-2 days
+        - generic [ref=e339]:
+          - generic [ref=e341]: "3"
+          - generic [ref=e342]:
+            - heading "Deploy" [level=3] [ref=e343]
+            - paragraph [ref=e344]: Push to production with built-in CI/CD and monitoring
+            - generic [ref=e345]: 30 minutes
+        - generic [ref=e346]:
+          - generic [ref=e348]: "4"
+          - generic [ref=e349]:
+            - heading "Launch" [level=3] [ref=e350]
+            - paragraph [ref=e351]: Start acquiring customers and iterating based on feedback
+            - generic [ref=e352]: Day 1
+      - generic [ref=e353]:
+        - heading "Your SaaS is Live" [level=3] [ref=e354]
+        - paragraph [ref=e355]: With paying customers, recurring revenue, and a scalable foundation
+        - generic [ref=e356]: While competitors are still in development
+    - generic [ref=e359]:
+      - heading "Ready to Ship Your SaaS?" [level=2] [ref=e360]
+      - paragraph [ref=e361]: Join hundreds of developers who've already launched successful products
+      - generic [ref=e362]:
+        - link "Start Building Now" [ref=e363] [cursor=pointer]:
+          - /url: /auth/signup
+          - button "Start Building Now" [ref=e364]:
+            - text: Start Building Now
+            - img [ref=e365]
+        - link "View Pricing" [ref=e368] [cursor=pointer]:
+          - /url: /subscription
+          - button "View Pricing" [ref=e369]
+      - generic [ref=e370]:
+        - generic [ref=e371]:
+          - img [ref=e372]
+          - generic [ref=e374]: No credit card required
+        - generic [ref=e375]:
+          - img [ref=e376]
+          - generic [ref=e379]: Setup in 5 minutes
+        - generic [ref=e380]:
+          - img [ref=e381]
+          - generic [ref=e383]: 30-day money back
+    - generic [ref=e385]:
+      - generic [ref=e386]:
+        - generic [ref=e387]:
+          - generic [ref=e388]:
+            - img [ref=e390]
+            - generic [ref=e392]: SaaS Template
+          - paragraph [ref=e393]: Production-ready SaaS boilerplate for developers
+        - generic [ref=e394]:
+          - heading "Product" [level=4] [ref=e395]
+          - list [ref=e396]:
+            - listitem [ref=e397]:
+              - link "Features" [ref=e398] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e399]:
+              - link "Pricing" [ref=e400] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e401]:
+              - link "Documentation" [ref=e402] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e403]:
+              - link "GitHub" [ref=e404] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e405]:
+          - heading "Company" [level=4] [ref=e406]
+          - list [ref=e407]:
+            - listitem [ref=e408]:
+              - link "About" [ref=e409] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e410]:
+              - link "Blog" [ref=e411] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e412]:
+              - link "Contact" [ref=e413] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e414]:
+              - link "Careers" [ref=e415] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e416]:
+          - heading "Legal" [level=4] [ref=e417]
+          - list [ref=e418]:
+            - listitem [ref=e419]:
+              - link "Privacy" [ref=e420] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e421]:
+              - link "Terms" [ref=e422] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e423]:
+              - link "Security" [ref=e424] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e425]:
+              - link "Status" [ref=e426] [cursor=pointer]:
+                - /url: "#"
+      - generic [ref=e427]:
+        - paragraph [ref=e428]: © 2024 SaaS Template. All rights reserved.
+        - generic [ref=e429]:
+          - link [ref=e430] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e431]
+          - link [ref=e434] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e435]
+          - link [ref=e437] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e438]
+          - link [ref=e442] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e443]
+  - button "Open Next.js Dev Tools" [ref=e451] [cursor=pointer]:
+    - img [ref=e452]
+  - alert [ref=e456]
+```

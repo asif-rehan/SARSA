@@ -13,6 +13,7 @@ import { HoverCard } from '@/components/interactions/hover-card';
 import { FadeIn } from '@/components/transitions/fade-in';
 import { StaggerContainer, StaggerItem } from '@/components/interactions/stagger-container';
 import { FormStatus } from '@/components/forms/form-status';
+import { CurrentSubscriptionSection, UserSubscription } from './CurrentSubscriptionSection';
 
 interface SubscriptionPlan {
   id: string;
@@ -29,11 +30,7 @@ interface UserSession {
     name: string;
     email: string;
     emailVerified: boolean;
-    subscription?: {
-      plan: string;
-      status: string;
-      currentPeriodEnd?: string;
-    };
+    subscription?: UserSubscription;
   };
 }
 
@@ -79,7 +76,7 @@ export function SubscriptionPlans() {
       const sessionData = await authClient.getSession();
       
       if (sessionData?.data?.user) {
-        // Fetch user's subscription data
+        // Fetch user's subscription data with improved error handling
         try {
           const subscriptionResponse = await fetch('/api/user-subscription');
           if (subscriptionResponse.ok) {
@@ -94,7 +91,8 @@ export function SubscriptionPlans() {
             setSession({ user: sessionData.data.user });
           }
         } catch (error) {
-          // If API call fails, just set user without subscription
+          console.error('Failed to fetch subscription data:', error);
+          // Set user without subscription if API fails
           setSession({ user: sessionData.data.user });
         }
       } else {
@@ -140,25 +138,12 @@ export function SubscriptionPlans() {
     });
   };
 
-  const getCurrentPlan = () => {
-    if (!session?.user?.subscription) return null;
-    return plans.find(plan => plan.id === session.user.subscription?.plan);
-  };
 
-  const canUpgradeTo = (planId: string) => {
-    if (!session?.user?.subscription) return true;
-    
-    const planHierarchy = ['basic', 'pro', 'enterprise'];
-    const currentIndex = planHierarchy.indexOf(session.user.subscription.plan);
-    const targetIndex = planHierarchy.indexOf(planId);
-    
-    return targetIndex !== currentIndex;
-  };
 
   const getButtonText = (plan: SubscriptionPlan) => {
-    if (!session?.user) return 'Sign Up to Subscribe';
+    if (!session?.user) return 'Sign In to Subscribe';
     if (!session.user.emailVerified) return 'Verify Email First';
-    if (!session.user.subscription) return `Upgrade to ${plan.name}`;
+    if (!session.user.subscription) return `Select ${plan.name}`;
     
     const currentPlan = session.user.subscription.plan;
     if (currentPlan === plan.id) return 'Current Plan';
@@ -172,15 +157,7 @@ export function SubscriptionPlans() {
     return `Switch to ${plan.name}`;
   };
 
-  const getButtonStyle = (plan: SubscriptionPlan) => {
-    if (!session?.user) return 'bg-blue-600 text-white hover:bg-blue-700';
-    if (!session.user.subscription) return 'bg-blue-600 text-white hover:bg-blue-700';
-    
-    const currentPlan = session.user.subscription.plan;
-    if (currentPlan === plan.id) return 'bg-gray-300 text-gray-500 cursor-not-allowed';
-    
-    return 'bg-blue-600 text-white hover:bg-blue-700';
-  };
+
 
   if (loading) {
     return <SubscriptionSkeleton />;
@@ -228,8 +205,11 @@ export function SubscriptionPlans() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button asChild className="w-full sm:w-auto min-h-[48px]">
-                <a href="/auth/signup">Create Account</a>
+              <Button 
+                onClick={() => window.location.href = '/auth/signup'}
+                className="w-full sm:w-auto min-h-[48px]"
+              >
+                Create Account
               </Button>
               <p className="text-sm text-muted-foreground">
                 Already have an account? <a href="/auth/signin" className="text-primary hover:underline">Sign In</a>
@@ -247,33 +227,31 @@ export function SubscriptionPlans() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full sm:w-auto min-h-[48px]">
-                <a href="/auth/verify-email">Verify Email</a>
+              <Button 
+                onClick={() => window.location.href = '/auth/verify-email'}
+                className="w-full sm:w-auto min-h-[48px]"
+              >
+                Verify Email
               </Button>
             </CardContent>
           </Card>
         </FadeIn>
       ) : (
-        /* Current Subscription Status - Mobile optimized */
-        session.user.subscription && (
-          <FadeIn delay={0.2}>
-            <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg sm:text-xl">Current Subscription</CardTitle>
-                <CardDescription className="text-sm sm:text-base">
-                  Your active subscription details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm sm:text-base">
-                <p><strong>Plan:</strong> {session.user.subscription.plan}</p>
-                <p><strong>Status:</strong> {session.user.subscription.status}</p>
-                {session.user.subscription.currentPeriodEnd && (
-                  <p><strong>Next Billing:</strong> {formatDate(session.user.subscription.currentPeriodEnd)}</p>
-                )}
-              </CardContent>
-            </Card>
-          </FadeIn>
-        )
+        /* Current Subscription Status - Using new CurrentSubscriptionSection component */
+        <CurrentSubscriptionSection 
+          subscription={session.user.subscription || null}
+          onSubscriptionChange={(updatedSubscription) => {
+            if (session?.user) {
+              setSession({
+                ...session,
+                user: {
+                  ...session.user,
+                  subscription: updatedSubscription || undefined,
+                },
+              });
+            }
+          }}
+        />
       )}
 
       {/* Subscription Plans Grid - Mobile-first responsive */}
@@ -338,14 +316,7 @@ export function SubscriptionPlans() {
         ))}
       </StaggerContainer>
 
-      {/* User Info for Debugging */}
-      {session?.user && (
-        <div className="bg-muted border rounded-lg p-4 mt-8">
-          <h4 className="font-semibold mb-2 text-foreground">Debug Info</h4>
-          <p className="text-foreground"><strong>User:</strong> {session.user.email}</p>
-          <p className="text-foreground"><strong>Subscription:</strong> {session.user.subscription ? JSON.stringify(session.user.subscription) : 'None'}</p>
-        </div>
-      )}
+
 
       {/* Billing History Section */}
       {session?.user && (

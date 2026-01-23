@@ -7,6 +7,7 @@ interface StaggerContainerProps {
   children: ReactNode
   className?: string
   staggerDelay?: number
+  [key: string]: any // Allow any additional props
 }
 
 const containerVariants = {
@@ -30,7 +31,7 @@ const itemVariants = {
   },
 }
 
-export function StaggerContainer({ children, className, staggerDelay = 0.1 }: StaggerContainerProps) {
+export function StaggerContainer({ children, className, staggerDelay = 0.1, ...props }: StaggerContainerProps) {
   const modifiedContainerVariants = {
     ...containerVariants,
     visible: {
@@ -47,6 +48,7 @@ export function StaggerContainer({ children, className, staggerDelay = 0.1 }: St
       variants={modifiedContainerVariants}
       initial="hidden"
       animate="visible"
+      {...props}
     >
       {children}
     </motion.div>

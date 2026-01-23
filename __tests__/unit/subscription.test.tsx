@@ -38,6 +38,24 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }));
 
+// Mock useSubscriptionManagement hook
+vi.mock('@/hooks/useSubscriptionManagement', () => ({
+  useSubscriptionManagement: vi.fn(() => ({
+    state: {
+      loading: false,
+      error: null,
+      success: null,
+    },
+    handleUpgrade: vi.fn(),
+    handleDowngrade: vi.fn(),
+    handleCancel: vi.fn(),
+    handleReactivate: vi.fn(),
+    handleManage: vi.fn(),
+    clearMessages: vi.fn(),
+    refreshSubscription: vi.fn(),
+  })),
+}));
+
 describe('Subscription Plans Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -66,14 +84,21 @@ describe('Subscription Plans Component', () => {
       render(<SubscriptionPlans />);
       
       await waitFor(() => {
-        expect(screen.getByText(/\$9\/month/i)).toBeInTheDocument();
-        expect(screen.getByText(/\$29\/month/i)).toBeInTheDocument();
-        expect(screen.getByText(/\$99\/month/i)).toBeInTheDocument();
-      });
+        // Wait for the plans to be visible (they should show even when not logged in)
+        expect(screen.getByText('Basic Plan')).toBeInTheDocument();
+        expect(screen.getByText('Pro Plan')).toBeInTheDocument();
+        expect(screen.getByText('Enterprise Plan')).toBeInTheDocument();
+        
+        // The pricing is split across elements, so check for both parts
+        expect(screen.getByText('$9')).toBeInTheDocument();
+        expect(screen.getAllByText('/month')).toHaveLength(3); // One for each plan
+        expect(screen.getByText('$29')).toBeInTheDocument();
+        expect(screen.getByText('$99')).toBeInTheDocument();
+      }, { timeout: 3000 });
     });
 
     it('should handle plan selection correctly', async () => {
-      // Mock logged-in user
+      // Mock logged-in user with verified email
       const { authClient } = await import('@/lib/auth-client');
       vi.mocked(authClient.getSession).mockResolvedValue({
         data: {
@@ -81,6 +106,7 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
           },
         },
       });
@@ -102,7 +128,7 @@ describe('Subscription Plans Component', () => {
     });
 
     it('should validate payment form inputs', async () => {
-      // Mock logged-in user
+      // Mock logged-in user with verified email
       const { authClient } = await import('@/lib/auth-client');
       vi.mocked(authClient.getSession).mockResolvedValue({
         data: {
@@ -110,6 +136,7 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
           },
         },
       });
@@ -148,6 +175,7 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
             subscription: {
               plan: 'pro',
               status: 'active',
@@ -170,8 +198,11 @@ describe('Subscription Plans Component', () => {
       
       await waitFor(() => {
         expect(screen.getByText(/Current Subscription/)).toBeInTheDocument();
-        expect(screen.getByText('pro')).toBeInTheDocument();
-        expect(screen.getByText('active')).toBeInTheDocument();
+        // Check for the individual text elements since they're in separate elements
+        expect(screen.getByText('Plan:')).toBeInTheDocument();
+        expect(screen.getAllByText('Pro Plan')).toHaveLength(2); // One in current subscription, one in plan card
+        expect(screen.getByText('Status:')).toBeInTheDocument();
+        expect(screen.getByText('Active')).toBeInTheDocument();
         expect(screen.getByText(/Next Billing:/)).toBeInTheDocument();
         expect(screen.getByText('December 31, 2024')).toBeInTheDocument();
       });
@@ -197,7 +228,7 @@ describe('Subscription Plans Component', () => {
     });
 
     it('should show billing history section', async () => {
-      // Mock logged-in user
+      // Mock logged-in user with verified email and subscription
       const { authClient } = await import('@/lib/auth-client');
       vi.mocked(authClient.getSession).mockResolvedValue({
         data: {
@@ -205,6 +236,12 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
+            subscription: {
+              plan: 'pro',
+              status: 'active',
+              currentPeriodEnd: '2024-12-31T00:00:00Z',
+            },
           },
         },
       });
@@ -233,15 +270,15 @@ describe('Subscription Plans Component', () => {
       render(<SubscriptionPlans />);
       
       await waitFor(() => {
-        expect(screen.getByText('Billing History')).toBeInTheDocument();
-        // Use a more flexible matcher for the date since timezone conversion might affect it
-        expect(screen.getByText(/\$29\.00 - (October 31|November 1), 2024/)).toBeInTheDocument();
-        expect(screen.getByText(/\$29\.00 - (September 30|October 1), 2024/)).toBeInTheDocument();
+        expect(screen.getByText('Recent Invoices')).toBeInTheDocument(); // Updated to match actual component text
+        // Check for the invoice amounts and dates separately since they're in different elements
+        expect(screen.getAllByText('$29.00')).toHaveLength(2); // Two invoices with same amount
+        expect(screen.getByText(/November 1, 2024|October 31, 2024/)).toBeInTheDocument();
       });
     });
 
     it('should handle payment processing errors gracefully', async () => {
-      // Mock logged-in user
+      // Mock logged-in user with verified email
       const { authClient } = await import('@/lib/auth-client');
       vi.mocked(authClient.getSession).mockResolvedValue({
         data: {
@@ -249,6 +286,7 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
           },
         },
       });
@@ -288,7 +326,7 @@ describe('Subscription Plans Component', () => {
     });
 
     it('should be accessible with proper ARIA attributes', async () => {
-      // Mock logged-in user to ensure component renders properly
+      // Mock logged-in user with verified email to ensure component renders properly
       const { authClient } = await import('@/lib/auth-client');
       vi.mocked(authClient.getSession).mockResolvedValue({
         data: {
@@ -296,6 +334,7 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
           },
         },
       });
@@ -329,7 +368,7 @@ describe('Subscription Plans Component', () => {
     });
 
     it('should be responsive on different screen sizes', async () => {
-      // Mock logged-in user to ensure component renders properly
+      // Mock logged-in user with verified email to ensure component renders properly
       const { authClient } = await import('@/lib/auth-client');
       vi.mocked(authClient.getSession).mockResolvedValue({
         data: {
@@ -337,6 +376,7 @@ describe('Subscription Plans Component', () => {
             id: 'user123',
             email: 'test@example.com',
             name: 'Test User',
+            emailVerified: true, // Make sure email is verified
           },
         },
       });
@@ -348,9 +388,12 @@ describe('Subscription Plans Component', () => {
         expect(screen.getByText('Subscription Plans')).toBeInTheDocument();
       });
       
-      // Should render correctly on mobile
-      const subscriptionGrid = screen.getByTestId('subscription-plans-grid');
-      expect(subscriptionGrid).toHaveClass('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+      // Wait for the grid to be visible (it has animation)
+      await waitFor(() => {
+        const subscriptionGrid = screen.getByTestId('subscription-plans-grid');
+        expect(subscriptionGrid).toBeInTheDocument();
+        expect(subscriptionGrid).toHaveClass('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+      }, { timeout: 2000 }); // Give more time for animations
     });
   });
 });
