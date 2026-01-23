@@ -66,7 +66,7 @@ This implementation plan addresses the subscription flow user experience issues 
     - Ensure minimum touch target sizes (48px) for mobile
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 6.4_
 
-  - [ ] 4.2 Write property test for subscription management actions
+  - [x] 4.2 Write property test for subscription management actions
     - **Property 4: Subscription Management Actions Availability**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4**
 
