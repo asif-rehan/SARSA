@@ -19,9 +19,9 @@ export async function GET(request: NextRequest) {
     const subscription = await db
       .selectFrom('subscription')
       .selectAll()
-      .where('user_id', '=', session.user.id)
+      .where('referenceId', '=', session.user.id)
       .where('status', 'in', ['active', 'trialing', 'past_due'])
-      .orderBy('created_at', 'desc')
+      .orderBy('id', 'desc')
       .executeTakeFirst();
 
     if (!subscription) {
@@ -29,13 +29,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Map database subscription to expected format
-    const priceId = subscription.price_id || '';
+    const planName = subscription.plan || '';
     const subscriptionData = {
-      plan: priceId.includes('test_basic') ? 'basic' : 
-            priceId.includes('test_pro') ? 'pro' : 'enterprise',
+      plan: planName,
       status: subscription.status,
-      currentPeriodEnd: subscription.current_period_end?.toISOString(),
-      stripeSubscriptionId: subscription.stripe_subscription_id,
+      currentPeriodEnd: subscription.periodEnd?.toISOString(),
+      stripeSubscriptionId: subscription.stripeSubscriptionId,
     };
 
     return NextResponse.json({ subscription: subscriptionData });

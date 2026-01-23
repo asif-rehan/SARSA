@@ -19,9 +19,10 @@ SubscriptionPlans (Main Component)
 │   ├── StatusBadge  
 │   └── ManagementActions
 ├── PlanSelectionGrid (Existing)
-├── BillingHistory (Existing)
-└── PaymentForm (Existing)
+└── BillingHistory (Existing)
 ```
+
+**Note**: The PaymentForm modal component has been removed to provide direct Stripe Checkout integration without intermediate UI steps.
 
 ### Data Flow Architecture
 

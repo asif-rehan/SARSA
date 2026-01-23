@@ -1,11 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { EmailService } from '@/lib/email-service';
 import Stripe from 'stripe';
+import { generateId } from 'better-auth/utils';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
 });
+
+// Helper function to generate a random password
+function generateRandomPassword(length: number = 12): string {
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  return password;
+}
+
+// Helper function to get plan name from price ID
+function getPlanNameFromPriceId(priceId: string): string {
+  const planMap: Record<string, string> = {
+    [process.env.STRIPE_BASIC_PRICE_ID || '']: 'Basic Plan',
+    [process.env.STRIPE_PRO_PRICE_ID || '']: 'Pro Plan',
+    [process.env.STRIPE_ENTERPRISE_PRICE_ID || '']: 'Enterprise Plan',
+  };
+  return planMap[priceId] || 'Subscription Plan';
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,22 +68,94 @@ export async function POST(request: NextRequest) {
             session.subscription as string
           );
           
-          const userId = session.metadata?.userId;
+          // Get customer details
+          const customer = await stripe.customers.retrieve(session.customer as string) as Stripe.Customer;
+          
+          let userId = session.metadata?.userId;
+          const isGuestCheckout = session.metadata?.isGuestCheckout === 'true';
+          
+          // Handle guest checkout - create account automatically
+          if (isGuestCheckout && !userId) {
+            try {
+              console.log(`🔄 Processing guest checkout for customer: ${customer.email}`);
+              
+              // Check if user already exists with this email
+              const existingUser = await db
+                .selectFrom('user')
+                .select(['id', 'emailVerified'])
+                .where('email', '=', customer.email!)
+                .executeTakeFirst();
+              
+              if (existingUser) {
+                // User exists, use their ID
+                userId = existingUser.id;
+                console.log(`✅ Using existing user ${userId} for guest checkout`);
+              } else {
+                // Create new user account
+                const newUserId = generateId();
+                const randomPassword = generateRandomPassword();
+                
+                console.log(`🆕 Creating new user account for: ${customer.email}`);
+                
+                // Create user with Better-Auth
+                const newUser = await auth.api.signUpEmail({
+                  body: {
+                    email: customer.email!,
+                    password: randomPassword,
+                    name: customer.name || customer.email!.split('@')[0],
+                  },
+                });
+                
+                if (newUser.error) {
+                  console.error('❌ Failed to create user account:', newUser.error);
+                  // Continue with subscription creation even if user creation fails
+                } else {
+                  userId = newUser.data?.user?.id || newUserId;
+                  console.log(`✅ Created new user ${userId} for guest checkout`);
+                  
+                  // Send welcome email with verification
+                  const planName = getPlanNameFromPriceId(subscription.items.data[0]?.price?.id || '');
+                  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify-email?token=${newUser.data?.verificationToken || ''}`;
+                  
+                  console.log(`📧 Sending welcome email to: ${customer.email}`);
+                  
+                  const welcomeResult = await EmailService.sendWelcomeWithVerification({
+                    customerEmail: customer.email!,
+                    customerName: customer.name || undefined,
+                    planName,
+                    verificationUrl,
+                  });
+                  
+                  if (welcomeResult.success) {
+                    console.log(`✅ Welcome email sent successfully (ID: ${welcomeResult.data?.id})`);
+                  } else {
+                    console.error('❌ Failed to send welcome email:', welcomeResult.error);
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('❌ Error handling guest checkout user creation:', error);
+              // Continue with subscription creation
+            }
+          }
+          
           if (!userId) {
-            console.error('No userId in session metadata');
+            console.error('No userId available for subscription creation');
             break;
           }
 
-          // Create or update customer record
+          // Update user with Stripe customer ID
           await db
-            .insertInto('customer')
-            .values({
-              id: `customer_${Date.now()}`,
-              user_id: userId,
-              stripe_customer_id: session.customer as string,
+            .updateTable('user')
+            .set({
+              stripeCustomerId: session.customer as string,
             })
-            .onConflict((oc) => oc.column('stripe_customer_id').doNothing())
+            .where('id', '=', userId)
             .execute();
+
+          // Get plan name from price ID
+          const planName = getPlanNameFromPriceId(subscription.items.data[0]?.price?.id || '');
+          const planId = planName.toLowerCase().replace(' plan', '').replace(' ', '');
 
           // Create subscription record
           const stripeSubscription = subscription as any;
@@ -69,17 +163,45 @@ export async function POST(request: NextRequest) {
             .insertInto('subscription')
             .values({
               id: `subscription_${Date.now()}`,
-              user_id: userId,
-              stripe_subscription_id: stripeSubscription.id,
-              stripe_customer_id: session.customer as string,
+              plan: planId,
+              referenceId: userId,
+              stripeCustomerId: session.customer as string,
+              stripeSubscriptionId: stripeSubscription.id,
               status: stripeSubscription.status,
-              price_id: stripeSubscription.items.data[0]?.price?.id,
-              quantity: stripeSubscription.items.data[0]?.quantity || 1,
-              cancel_at_period_end: stripeSubscription.cancel_at_period_end,
-              current_period_start: new Date(stripeSubscription.current_period_start * 1000),
-              current_period_end: new Date(stripeSubscription.current_period_end * 1000),
+              periodStart: new Date(stripeSubscription.current_period_start * 1000),
+              periodEnd: new Date(stripeSubscription.current_period_end * 1000),
+              cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
             })
             .execute();
+          
+          // Send payment receipt email
+          try {
+            const planName = getPlanNameFromPriceId(stripeSubscription.items.data[0]?.price?.id || '');
+            const amount = stripeSubscription.items.data[0]?.price?.unit_amount || 0;
+            const currency = stripeSubscription.items.data[0]?.price?.currency || 'usd';
+            
+            console.log(`📧 Sending payment receipt to: ${customer.email}`);
+            
+            const receiptResult = await EmailService.sendPaymentReceipt({
+              customerEmail: customer.email!,
+              customerName: customer.name || undefined,
+              planName,
+              amount,
+              currency,
+              subscriptionId: stripeSubscription.id,
+              nextBillingDate: new Date(stripeSubscription.current_period_end * 1000),
+              receiptUrl: session.receipt_email ? undefined : `https://dashboard.stripe.com/receipts/${session.payment_intent}`,
+            });
+            
+            if (receiptResult.success) {
+              console.log(`✅ Payment receipt sent successfully (ID: ${receiptResult.data?.id})`);
+            } else {
+              console.error('❌ Failed to send payment receipt:', receiptResult.error);
+            }
+          } catch (emailError) {
+            console.error('❌ Failed to send payment receipt:', emailError);
+            // Don't fail the webhook if email fails
+          }
         }
         break;
       }
@@ -92,12 +214,11 @@ export async function POST(request: NextRequest) {
           .updateTable('subscription')
           .set({
             status: subscription.status,
-            cancel_at_period_end: subscription.cancel_at_period_end,
-            current_period_start: new Date(subscription.current_period_start * 1000),
-            current_period_end: new Date(subscription.current_period_end * 1000),
-            updated_at: new Date(),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            periodStart: new Date(subscription.current_period_start * 1000),
+            periodEnd: new Date(subscription.current_period_end * 1000),
           })
-          .where('stripe_subscription_id', '=', subscription.id)
+          .where('stripeSubscriptionId', '=', subscription.id)
           .execute();
         break;
       }
@@ -110,9 +231,8 @@ export async function POST(request: NextRequest) {
           .updateTable('subscription')
           .set({
             status: 'canceled',
-            updated_at: new Date(),
           })
-          .where('stripe_subscription_id', '=', subscription.id)
+          .where('stripeSubscriptionId', '=', subscription.id)
           .execute();
         break;
       }

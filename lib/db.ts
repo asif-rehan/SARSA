@@ -4,12 +4,20 @@ import { Pool } from "pg";
 // Database schema interfaces
 interface User {
   id: string;
+  name: string;
   email: string;
-  name?: string;
+  emailVerified: boolean;
   image?: string;
-  emailVerified?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  stripeCustomerId?: string;
+  role?: string;
+  banned?: boolean;
+  banReason?: string;
+  banExpires?: Date;
+  username?: string;
+  displayUsername?: string;
+  twoFactorEnabled?: boolean;
 }
 
 interface Session {
@@ -38,27 +46,22 @@ interface Verification {
   createdAt?: Date;
 }
 
-interface Customer {
-  id: string;
-  user_id: string;
-  stripe_customer_id: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
-
 interface Subscription {
   id: string;
-  user_id: string;
-  stripe_subscription_id: string;
-  stripe_customer_id?: string;
+  plan: string;
+  referenceId: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
   status: string;
-  price_id?: string;
-  quantity?: number;
-  cancel_at_period_end?: boolean;
-  current_period_start?: Date;
-  current_period_end?: Date;
-  created_at?: Date;
-  updated_at?: Date;
+  periodStart?: Date;
+  periodEnd?: Date;
+  trialStart?: Date;
+  trialEnd?: Date;
+  cancelAtPeriodEnd?: boolean;
+  cancelAt?: Date;
+  canceledAt?: Date;
+  endedAt?: Date;
+  seats?: number;
 }
 
 interface Database {
@@ -66,7 +69,6 @@ interface Database {
   session: Session;
   account: Account;
   verification: Verification;
-  customer: Customer;
   subscription: Subscription;
 }
 

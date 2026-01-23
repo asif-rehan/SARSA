@@ -127,7 +127,21 @@ This implementation plan addresses the subscription flow user experience issues 
     - Test color contrast requirements
     - _Requirements: 5.3, 6.4_
 
-- [x] 9. Final checkpoint - Complete testing and validation
+- [x] 9. Remove unnecessary payment modal
+  - [x] 9.1 Remove StripePaymentForm modal component
+    - Remove modal that appears before Stripe Checkout
+    - Ensure direct redirect to Stripe Checkout on plan selection
+    - Clean up unused imports and state management
+    - _Requirements: Improved user experience, reduced friction_
+
+- [x] 10. Add webhook setup documentation
+  - [x] 10.1 Create WEBHOOK_SETUP.md documentation
+    - Document why emails don't work in local development
+    - Provide solutions for testing webhooks locally (ngrok, Stripe CLI)
+    - Explain production vs development behavior
+    - _Requirements: Developer experience, testing guidance_
+
+- [x] 11. Final checkpoint - Complete testing and validation
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

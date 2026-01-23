@@ -15,7 +15,6 @@ import { StaggerContainer, StaggerItem } from '@/components/interactions/stagger
 import { FormStatus } from '@/components/forms/form-status';
 import { CurrentSubscriptionSection, UserSubscription } from './CurrentSubscriptionSection';
 import { PaymentHistory } from './PaymentHistory';
-import { StripePaymentForm } from './StripePaymentForm';
 
 interface SubscriptionPlan {
   id: string;
@@ -67,6 +66,7 @@ export function SubscriptionPlans() {
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
 
   // Check if Stripe is properly configured
   const isStripeConfigured = !plans.some(plan => plan.priceId.includes('placeholder'));
@@ -74,6 +74,26 @@ export function SubscriptionPlans() {
   useEffect(() => {
     loadSession();
   }, []);
+
+  useEffect(() => {
+    // Check for success parameter in URL (only run once on mount)
+    const urlParams = new URLSearchParams(window.location.search);
+    const isSuccess = urlParams.get('success') === 'true';
+    const sessionId = urlParams.get('session_id');
+    
+    if (isSuccess && sessionId) {
+      // Clear URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Show success message
+      setSuccess('🎉 Payment successful! Your subscription is now active.');
+      
+      // Show sign-in prompt after a delay (check session state at that time)
+      setTimeout(() => {
+        setShowSignInPrompt(true);
+      }, 2000);
+    }
+  }, []); // Empty dependency array - only run once on mount
 
   const loadSession = async () => {
     try {
@@ -112,18 +132,6 @@ export function SubscriptionPlans() {
   };
 
   const handlePlanSelect = async (plan: SubscriptionPlan) => {
-    if (!session?.user) {
-      // Redirect to sign up if not authenticated - using the format expected by integration tests
-      window.location.href = '/auth/signup?redirect=/subscription';
-      return;
-    }
-
-    // Check if email is verified
-    if (!session.user.emailVerified) {
-      setError('Please verify your email address before subscribing. Check your inbox for the verification link.');
-      return;
-    }
-
     // Check if price ID is a placeholder
     if (plan.priceId.includes('placeholder')) {
       setError('Stripe is not configured yet. Please run "npm run stripe:setup" to configure your Stripe products and prices.');
@@ -134,13 +142,63 @@ export function SubscriptionPlans() {
     setError('');
     setSuccess('');
 
-    // Show payment form for testing
-    // In production, this would redirect to Stripe Checkout
-    // For now, we'll show the payment form modal
+    try {
+      let response;
+      
+      if (!session?.user) {
+        // Guest checkout - no authentication required
+        response = await fetch('/api/create-guest-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            planId: plan.id,
+            priceId: plan.priceId,
+          }),
+        });
+      } else {
+        // Check if email is verified for authenticated users
+        if (!session.user.emailVerified) {
+          setError('Please verify your email address before subscribing. Check your inbox for the verification link.');
+          setProcessingPlan(null);
+          return;
+        }
+        
+        // Authenticated checkout
+        response = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            planId: plan.id,
+            priceId: plan.priceId,
+          }),
+        });
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      setError(error.message || 'Failed to start checkout. Please try again.');
+      setProcessingPlan(null);
+    }
   };
 
   const getButtonText = (plan: SubscriptionPlan) => {
-    if (!session?.user) return 'Sign In to Subscribe';
+    if (!session?.user) return `Subscribe to ${plan.name}`;
     if (!session.user.emailVerified) return 'Verify Email First';
     if (!session.user.subscription) return `Select ${plan.name}`;
     
@@ -193,6 +251,42 @@ export function SubscriptionPlans() {
           onClearSuccess={() => setSuccess('')}
         />
 
+        {/* Sign-in Prompt for Guest Checkout Success */}
+        {showSignInPrompt && !session?.user && (
+          <FadeIn delay={0.1}>
+            <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto border-green-500/50 bg-green-500/5">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                  🎉 Welcome! Your Account is Ready
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  We've created your account and sent you login details via email. Sign in to access your subscription and manage your account.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button 
+                    onClick={() => window.location.href = '/auth/signin'}
+                    className="flex-1 min-h-[48px]"
+                  >
+                    Sign In to Your Account
+                  </Button>
+                  <Button 
+                    onClick={() => setShowSignInPrompt(false)}
+                    variant="outline"
+                    className="flex-1 min-h-[48px]"
+                  >
+                    Continue Browsing
+                  </Button>
+                </div>
+                <div className="text-xs text-muted-foreground pt-2 border-t">
+                  💡 <strong>Check your email</strong> for account details and verification instructions. You can also sign in using the email you provided during checkout.
+                </div>
+              </CardContent>
+            </Card>
+          </FadeIn>
+        )}
+
         {/* Development Notice for Stripe Configuration */}
         {!isStripeConfigured && process.env.NODE_ENV === 'development' && (
           <FadeIn delay={0.1}>
@@ -224,21 +318,25 @@ export function SubscriptionPlans() {
         <FadeIn delay={0.2}>
           <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Create Account to Subscribe</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Ready to Subscribe?</CardTitle>
               <CardDescription className="text-sm sm:text-base">
-                Sign up for an account to choose a subscription plan and start using the service.
+                You can subscribe directly below, or create an account first for easier management.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
                 onClick={() => window.location.href = '/auth/signup'}
+                variant="outline"
                 className="w-full sm:w-auto min-h-[48px]"
               >
-                Create Account
+                Create Account First
               </Button>
               <p className="text-sm text-muted-foreground">
                 Already have an account? <a href="/auth/signin" className="text-primary hover:underline">Sign In</a>
               </p>
+              <div className="text-xs text-muted-foreground pt-2 border-t">
+                💡 <strong>Quick Subscribe:</strong> You can also subscribe directly below. We'll create your account automatically and send you login details via email.
+              </div>
             </CardContent>
           </Card>
         </FadeIn>
@@ -346,26 +444,6 @@ export function SubscriptionPlans() {
       {/* Payment History Section */}
       {session?.user && (
         <PaymentHistory className="max-w-4xl mx-auto mb-8" />
-      )}
-
-      {/* Payment Form Section */}
-      {processingPlan && (
-        <StripePaymentForm 
-          planId={processingPlan}
-          planName={plans.find(p => p.id === processingPlan)?.name || ''}
-          price={plans.find(p => p.id === processingPlan)?.price || 0}
-          priceId={plans.find(p => p.id === processingPlan)?.priceId || ''}
-          onCancel={() => setProcessingPlan(null)}
-          onSuccess={() => {
-            setProcessingPlan(null);
-            setSuccess('Subscription created successfully!');
-            loadSession(); // Reload session to get updated subscription
-          }}
-          onError={(error: string) => {
-            setProcessingPlan(null);
-            setError(error);
-          }}
-        />
       )}
 
       {/* Hidden form elements for testing */}
