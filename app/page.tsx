@@ -83,13 +83,13 @@ export default function Home() {
                   {emailSubmitted ? "✓ Sent!" : "Get Started"}
                 </Button>
               </form>
-              <Link href="/auth/signin">
+              <Link href="/auth/signup">
                 <Button 
                   size="lg" 
                   variant="outline" 
                   className="min-h-[48px] w-full sm:w-auto"
                 >
-                  Sign In
+                  Sign Up
                 </Button>
               </Link>
             </div>

@@ -28,6 +28,7 @@ interface UserSession {
     id: string;
     name: string;
     email: string;
+    emailVerified: boolean;
     subscription?: {
       plan: string;
       status: string;
@@ -109,8 +110,14 @@ export function SubscriptionPlans() {
 
   const handlePlanSelect = async (plan: SubscriptionPlan) => {
     if (!session?.user) {
-      // Redirect to sign in if not authenticated
-      window.location.href = '/auth/signin';
+      // Redirect to sign up if not authenticated
+      window.location.href = '/auth/signup?redirect=/subscription';
+      return;
+    }
+
+    // Check if email is verified
+    if (!session.user.emailVerified) {
+      setError('Please verify your email address before subscribing. Check your inbox for the verification link.');
       return;
     }
 
@@ -149,7 +156,8 @@ export function SubscriptionPlans() {
   };
 
   const getButtonText = (plan: SubscriptionPlan) => {
-    if (!session?.user) return 'Sign In to Subscribe';
+    if (!session?.user) return 'Sign Up to Subscribe';
+    if (!session.user.emailVerified) return 'Verify Email First';
     if (!session.user.subscription) return `Upgrade to ${plan.name}`;
     
     const currentPlan = session.user.subscription.plan;
@@ -214,14 +222,33 @@ export function SubscriptionPlans() {
         <FadeIn delay={0.2}>
           <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Sign In Required</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Create Account to Subscribe</CardTitle>
               <CardDescription className="text-sm sm:text-base">
-                Please sign in to manage your subscription.
+                Sign up for an account to choose a subscription plan and start using the service.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full sm:w-auto min-h-[48px]">
+                <a href="/auth/signup">Create Account</a>
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Already have an account? <a href="/auth/signin" className="text-primary hover:underline">Sign In</a>
+              </p>
+            </CardContent>
+          </Card>
+        </FadeIn>
+      ) : !session.user.emailVerified ? (
+        <FadeIn delay={0.2}>
+          <Card className="mb-6 sm:mb-8 max-w-2xl mx-auto border-yellow-500/50 bg-yellow-500/5">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Verify Your Email</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
+                Please verify your email address before subscribing. Check your inbox for the verification link.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full sm:w-auto min-h-[48px]">
-                <a href="/auth/signin">Sign In</a>
+                <a href="/auth/verify-email">Verify Email</a>
               </Button>
             </CardContent>
           </Card>
