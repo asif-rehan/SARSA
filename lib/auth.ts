@@ -1,5 +1,8 @@
 import { betterAuth } from "better-auth";
 import { stripe } from "@better-auth/stripe";
+import { passkey } from "@better-auth/passkey";
+import { oAuthProvider } from "@better-auth/oauth-provider";
+import { admin, organization, twoFactor, username, magicLink } from "better-auth/plugins";
 import { Pool } from "pg";
 import Stripe from "stripe";
 import { Resend } from "resend";
@@ -76,8 +79,9 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
-  plugins: stripeInstance ? [
-    stripe({
+  plugins: [
+    // Stripe integration for payments and subscriptions
+    ...(stripeInstance ? [stripe({
       stripeClient: stripeInstance,
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       createCustomerOnSignUp: true,
@@ -110,8 +114,20 @@ export const auth = betterAuth({
           }
         ]
       }
+    })] : []),
+    
+    // Passkey plugin for WebAuthn/FIDO2 authentication
+    passkey({
+      rpName: "SaaS Template",
+      rpID: process.env.NEXT_PUBLIC_APP_URL?.replace(/https?:\/\//, '') || "localhost",
     }),
-  ] : [],
+    
+    // Admin plugin for user management - simplifies admin operations
+    admin({
+      defaultRole: "user",
+      adminRoles: ["admin"],
+    }),
+  ],
   baseURL: process.env.BETTER_AUTH_URL,
   trustedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
 });

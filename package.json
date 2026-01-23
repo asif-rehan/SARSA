@@ -19,6 +19,8 @@
     "setup": "./scripts/setup-env.sh && npm run db:start && npm run db:migrate"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "^1.4.17",
+    "@better-auth/passkey": "^1.4.17",
     "@better-auth/stripe": "^1.4.17",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-avatar": "^1.1.11",
