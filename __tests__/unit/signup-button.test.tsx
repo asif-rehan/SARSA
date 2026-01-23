@@ -45,7 +45,7 @@ describe('Signup Button Functionality', () => {
     
     // Check that at least one signup button has correct href
     const hasCorrectHref = signupButtons.some(button => 
-      button.getAttribute('href') === '/auth/signup'
+      button.getAttribute('href') === '/auth?mode=signup'
     );
     expect(hasCorrectHref).toBe(true);
   });
@@ -55,7 +55,7 @@ describe('Signup Button Functionality', () => {
     
     const startBuildingButton = screen.getByRole('link', { name: /start building now/i });
     expect(startBuildingButton).toBeInTheDocument();
-    expect(startBuildingButton).toHaveAttribute('href', '/auth/signup');
+    expect(startBuildingButton).toHaveAttribute('href', '/auth?mode=signup');
   });
 
   it('should navigate to signup page when clicked', () => {
@@ -66,7 +66,7 @@ describe('Signup Button Functionality', () => {
     
     // All signup buttons should have correct href
     signupButtons.forEach(button => {
-      expect(button).toHaveAttribute('href', '/auth/signup');
+      expect(button).toHaveAttribute('href', '/auth?mode=signup');
     });
   });
 

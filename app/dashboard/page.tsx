@@ -31,11 +31,11 @@ export default function Dashboard() {
         if (sessionData?.data?.user) {
           setSession({ user: sessionData.data.user });
         } else {
-          router.push('/auth/signin');
+          router.push('/auth?mode=signin');
         }
       } catch (error) {
         console.error('Failed to load session:', error);
-        router.push('/auth/signin');
+        router.push('/auth?mode=signin');
       } finally {
         setLoading(false);
       }

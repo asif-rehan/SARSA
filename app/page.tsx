@@ -71,7 +71,7 @@ export default function Home() {
                   {emailSubmitted ? "✓ Sent!" : "Get Started"}
                 </Button>
               </form>
-              <Link href="/auth/signup">
+              <Link href="/auth?mode=signup">
                 <Button 
                   size="lg" 
                   variant="outline" 
@@ -401,7 +401,7 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth/signup">
+              <Link href="/auth?mode=signup">
                 <Button size="lg" className="min-h-[56px] px-8 text-lg font-semibold w-full sm:w-auto">
                   Start Building Now
                   <ArrowRight className="ml-2 h-5 w-5" />

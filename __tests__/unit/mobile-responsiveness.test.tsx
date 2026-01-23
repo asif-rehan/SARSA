@@ -313,7 +313,7 @@ describe('Mobile Responsiveness', () => {
       signInButton.focus();
       
       expect(signInButton).toHaveFocus();
-      expect(signInButton).toHaveAttribute('href', '/auth/signin');
+      expect(signInButton).toHaveAttribute('href', '/auth?mode=signin');
     });
 
     it('should provide proper ARIA labels for mobile interactions', async () => {

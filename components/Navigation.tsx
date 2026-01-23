@@ -55,12 +55,12 @@ export default function Navigation({ currentPath }: NavigationProps) {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link href="/auth/signin">
+            <Link href="/auth?mode=signin">
               <Button variant="ghost" size="sm">
                 Sign In
               </Button>
             </Link>
-            <Link href="/auth/signup">
+            <Link href="/auth?mode=signup">
               <Button size="sm">
                 Sign Up
               </Button>
@@ -102,12 +102,12 @@ export default function Navigation({ currentPath }: NavigationProps) {
               
               {/* Mobile Auth Buttons */}
               <div className="flex flex-col space-y-2 pt-3 border-t">
-                <Link href="/auth/signin" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/auth?mode=signin" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" size="sm" className="w-full justify-start">
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
                   <Button size="sm" className="w-full">
                     Sign Up
                   </Button>
