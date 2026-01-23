@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { EmailPasswordForm } from '@/components/EmailPasswordForm';
+import EmailPasswordForm from '@/components/EmailPasswordForm';
 
 export default function SignUpPage() {
   return (

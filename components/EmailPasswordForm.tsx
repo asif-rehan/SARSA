@@ -6,8 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function EmailPasswordForm() {
-  const [isSignUp, setIsSignUp] = useState(false);
+interface EmailPasswordFormProps {
+  mode?: 'signin' | 'signup';
+}
+
+export default function EmailPasswordForm({ mode = 'signin' }: EmailPasswordFormProps) {
+  const [isSignUp, setIsSignUp] = useState(mode === 'signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
